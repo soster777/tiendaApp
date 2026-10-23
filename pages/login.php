@@ -41,7 +41,9 @@ include_once("../components/header.php");
                                     class="form-control"
                                     id="floatingCorreo"
                                     placeholder="Email"
-                                    name="mail">
+                                    name="mail"
+                                    maxlength="60"
+                                    required>
                                 <label for="floatingCorreo"></label>
                             </div>
                         </div>
@@ -55,7 +57,8 @@ include_once("../components/header.php");
                                     class="form-control"
                                     id="floatingClave"
                                     placeholder="Clave"
-                                    name="contrasena">
+                                    name="contrasena"
+                                    required>
                                 <label for="floatingClave"></label>
                             </div>
                         </div>
