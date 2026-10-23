@@ -6,14 +6,14 @@ include_once("../../components/permisos.php");
 $id_usuario = requiere_login("../../pages/login.php");
 
 if (!isset($_GET['id'])) {
-    header("Location: ../editar.php");
+    header("Location: " . lista_de_productos());
     exit();
 }
 
 $id_producto = intval($_GET['id']);
 
-if (!es_duenio_producto($con, $id_producto, $id_usuario)) {
-    header("Location: ../editar.php");
+if (!puede_editar_producto($con, $id_producto, $id_usuario)) {
+    header("Location: " . lista_de_productos());
     exit();
 }
 
@@ -27,7 +27,12 @@ $archivos = mysqli_query($con, $consulta_archivos);
 $consulta_cat = "SELECT * FROM categorias";
 $categorias = mysqli_query($con, $consulta_cat);
 
-include_once("../../components/header.php");
+// el admin ve su propio menu, el usuario el de la tienda
+if (es_admin()) {
+    include_once("../../components/header_admin.php");
+} else {
+    include_once("../../components/header.php");
+}
 ?>
 
 <main>

@@ -27,6 +27,9 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link montserrat-bold" href="/tiendApp/admin/productos.php">Productos</a>
+                        </li>
                         <li class="nav-item"> 
                             <a class="nav-link montserrat-bold" aria-current="page" href="/tiendApp/admin/categoria.php">Ver categorías</a> 
                         </li>

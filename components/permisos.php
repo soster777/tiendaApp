@@ -25,6 +25,32 @@ function requiere_admin()
     return intval($_SESSION['id_usuario']);
 }
 
+// true si el que esta logueado es administrador
+function es_admin()
+{
+    return isset($_SESSION['rol']) && $_SESSION['rol'] === 'admin';
+}
+
+// el admin puede modificar y borrar CUALQUIER producto desde su panel (lo pide la consigna del final);
+// un usuario comun solo los suyos
+function puede_editar_producto($con, $id_producto, $id_usuario)
+{
+    if (es_admin()) {
+        return true;
+    }
+    return es_duenio_producto($con, $id_producto, $id_usuario);
+}
+
+// a donde vuelve despues de modificar o borrar un producto:
+// el admin a la lista de todos los productos, el usuario a "Mis productos"
+function lista_de_productos()
+{
+    if (es_admin()) {
+        return "/tiendApp/admin/productos.php";
+    }
+    return "/tiendApp/editor/editar.php";
+}
+
 function es_duenio_producto($con, $id_producto, $id_usuario)
 {
     $stmt = mysqli_prepare($con, "SELECT id_producto FROM productos WHERE id_producto = ? AND fk_usuario = ?");

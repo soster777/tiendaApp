@@ -4,13 +4,13 @@ include_once("../../components/permisos.php");
 
 $id_usuario = requiere_login("../../pages/login.php");
 
-// llega por POST desde el boton Eliminar de "Mis productos"
+// llega por POST desde el boton Eliminar de "Mis productos" o del panel de productos del admin
 if (isset($_POST['id'])) {
 
     $id = intval($_POST['id']);
 
-    if (!es_duenio_producto($con, $id, $id_usuario)) {
-        header("Location: ../editar.php");
+    if (!puede_editar_producto($con, $id, $id_usuario)) {
+        header("Location: " . lista_de_productos());
         exit();
     }
 
@@ -21,7 +21,7 @@ if (isset($_POST['id'])) {
     mysqli_stmt_bind_param($stmt, "i", $id);
     mysqli_stmt_execute($stmt);
     if (mysqli_num_rows(mysqli_stmt_get_result($stmt)) > 0) {
-        header("Location: ../editar.php?baja=no");
+        header("Location: " . lista_de_productos() . "?baja=no");
         exit();
     }
 
@@ -45,10 +45,10 @@ if (isset($_POST['id'])) {
     mysqli_stmt_bind_param($stmt, "i", $id);
     mysqli_stmt_execute($stmt);
 
-    header("Location: ../editar.php?baja=ok");
+    header("Location: " . lista_de_productos() . "?baja=ok");
     exit();
 }
 
-header("Location: ../editar.php");
+header("Location: " . lista_de_productos());
 exit();
 ?>

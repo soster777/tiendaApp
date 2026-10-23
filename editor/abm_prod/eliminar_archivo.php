@@ -6,15 +6,15 @@ $id_usuario = requiere_login("../../pages/login.php");
 
 // llega por POST (el boton X del formulario de modificar)
 if (!isset($_POST['id_archivo']) || !isset($_POST['id_producto'])) {
-    header("Location: ../editar.php");
+    header("Location: " . lista_de_productos());
     exit();
 }
 
 $id_archivo = intval($_POST['id_archivo']);
 $id_producto = intval($_POST['id_producto']);
 
-if (!es_duenio_producto($con, $id_producto, $id_usuario)) {
-    header("Location: ../editar.php");
+if (!puede_editar_producto($con, $id_producto, $id_usuario)) {
+    header("Location: " . lista_de_productos());
     exit();
 }
 
