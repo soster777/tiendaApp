@@ -33,6 +33,9 @@
                         <li class="nav-item"> 
                             <a class="nav-link montserrat-bold" href="/tiendApp/admin/sugerencias.php">Ver sugerencias</a> 
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link montserrat-bold" href="/tiendApp/admin/usuarios.php">Usuarios</a>
+                        </li>
                         <li class='nav-item dropdown'> 
                             <a class='nav-link dropdown-toggle montserrat-bold' href='#' role='button' data-bs-toggle='dropdown' aria-expanded='false'> 
                                 👋 Hola, <?= htmlspecialchars($_SESSION['nombre'] ?? ''); ?> 
