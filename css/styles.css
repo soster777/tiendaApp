@@ -1,0 +1,1168 @@
+/* =========================================================
+   TiendApp - estilos
+   Rediseño basado en la maqueta de Stitch: fondo gris claro,
+   tarjetas blancas redondeadas, rojo de marca y tipografía Inter.
+   Todo se apoya en las clases que ya usan las páginas, así que
+   no hace falta tocar el HTML para que tome el diseño nuevo.
+   ========================================================= */
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
+
+/* ---------- Paleta y variables ---------- */
+:root {
+  --marca: #e5252a;
+  --marca-oscuro: #c81e23;
+  --marca-50: #fef2f2;
+  --marca-100: #fee2e2;
+  --marca-200: #fecaca;
+
+  --gris-50: #f8fafc;
+  --gris-100: #f1f5f9;
+  --gris-200: #e2e8f0;
+  --gris-300: #cbd5e1;
+  --gris-400: #94a3b8;
+  --gris-500: #64748b;
+  --gris-600: #475569;
+  --gris-700: #334155;
+  --gris-800: #1e293b;
+  --gris-900: #0f172a;
+
+  --verde: #059669;
+  --verde-oscuro: #047857;
+  --ambar: #d97706;
+
+  --radio: 1rem;
+  --radio-chico: 0.75rem;
+  --sombra: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.08);
+  --sombra-alta: 0 12px 28px -8px rgba(15, 23, 42, 0.18);
+  --transicion: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* le paso los colores a Bootstrap para que sus componentes combinen */
+  --bs-body-font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --bs-body-color: var(--gris-800);
+  --bs-body-bg: var(--gris-50);
+  --bs-link-color: var(--marca);
+  --bs-link-color-rgb: 229, 37, 42;
+  --bs-link-hover-color: var(--marca-oscuro);
+  --bs-link-hover-color-rgb: 200, 30, 35;
+  --bs-border-color: var(--gris-200);
+  --bs-border-radius: var(--radio-chico);
+}
+
+/* ---------- Base ---------- */
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body,
+#fondo,
+#fondo_admin {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--gris-50) !important;
+  color: var(--gris-800);
+  font-family: var(--bs-body-font-family);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--marca-100);
+  color: var(--marca-oscuro);
+}
+
+main {
+  flex: 1 0 auto;
+  padding: 2rem 0 3rem;
+}
+
+/* los <br> sueltos los usaban para esquivar el navbar fijo; con el header sticky sobran */
+body > br,
+main > br {
+  display: none;
+}
+
+main div.container-fluid {
+  overflow-x: hidden;
+}
+
+a {
+  transition: color var(--transicion);
+}
+
+/* las clases de tipografía viejas pasan a usar Inter, sin itálica */
+.montserrat-bold,
+.montserrat-regular,
+.poppins-bold-italic {
+  font-family: var(--bs-body-font-family);
+  font-style: normal;
+}
+
+.montserrat-bold {
+  font-weight: 700;
+}
+
+.montserrat-regular {
+  font-weight: 400;
+}
+
+/* =========================================================
+   Header
+   ========================================================= */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 1030;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--gris-200);
+}
+
+/* barra de anuncios de arriba (texto puesto desde CSS) */
+header::before {
+  content: "Envíos a todo el país con seguimiento  ·  Hasta 3 cuotas sin interés con tarjeta";
+  display: block;
+  padding: 0.5rem 1rem;
+  background: var(--gris-900);
+  color: var(--gris-300);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-align: center;
+  white-space: pre;
+}
+
+/* el navbar venía con position: fixed y un color inline; lo integro al header */
+.navbar,
+.navbar.fixed-top {
+  position: relative;
+  background: transparent !important;
+  padding: 0.85rem 0.5rem;
+}
+
+.navbar-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--gris-900) !important;
+  font-size: 1.5rem;
+  font-weight: 900 !important;
+  letter-spacing: -0.03em;
+  transition: color var(--transicion);
+}
+
+/* logo: imgs/logo.png (bolsa blanca sobre degradé rojo).
+   El HTML le pone width/height 30, acá lo agrando un poco y le doy sombra */
+.navbar-brand img {
+  flex-shrink: 0;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 12px -2px rgba(229, 37, 42, 0.4);
+  transition: transform var(--transicion);
+}
+
+.navbar-brand:hover {
+  color: var(--marca) !important;
+}
+
+.navbar-brand:hover img {
+  transform: scale(1.06);
+}
+
+.nav-link {
+  color: var(--gris-600) !important;
+  font-size: 0.925rem;
+  font-weight: 600 !important;
+  border-radius: 0.6rem;
+  padding: 0.5rem 0.85rem !important;
+  transition: color var(--transicion), background-color var(--transicion);
+}
+
+.nav-link:hover,
+.nav-link:focus,
+.nav-link.active,
+.nav-link.show {
+  color: var(--marca) !important;
+  background: var(--gris-100);
+}
+
+.navbar-toggler {
+  border: 1px solid var(--gris-200) !important;
+  border-radius: 0.6rem;
+  padding: 0.4rem 0.6rem;
+}
+
+.navbar-toggler:focus {
+  box-shadow: 0 0 0 3px rgba(229, 37, 42, 0.2);
+}
+
+/* buscador en forma de píldora con la lupa dibujada de fondo */
+.navbar form[role="search"] {
+  position: relative;
+  align-items: center;
+  margin-left: 0.75rem;
+}
+
+.navbar form[role="search"] .form-control {
+  min-width: 260px;
+  margin-right: 0 !important;
+  padding: 0.6rem 6rem 0.6rem 2.6rem;
+  border: 1px solid var(--gris-300);
+  border-radius: 999px;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' viewBox='0 0 24 24'%3E%3Cpath d='m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z'/%3E%3C/svg%3E") 0.95rem center / 1.1rem no-repeat,
+    var(--gris-50);
+  font-size: 0.9rem;
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.05);
+}
+
+.navbar form[role="search"] .form-control:focus {
+  background-color: #fff;
+  border-color: var(--marca);
+  box-shadow: 0 0 0 3px rgba(229, 37, 42, 0.18);
+}
+
+.navbar form[role="search"] .btn {
+  position: absolute;
+  top: 0.3rem;
+  right: 0.3rem;
+  bottom: 0.3rem;
+  padding: 0 1.1rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+}
+
+/* ---------- Menús desplegables ---------- */
+.dropdown-menu {
+  padding: 0.5rem;
+  border: 1px solid var(--gris-200);
+  border-radius: var(--radio-chico);
+  box-shadow: var(--sombra-alta);
+  min-width: 14rem;
+}
+
+.dropdown-item {
+  color: var(--gris-700) !important;
+  font-family: var(--bs-body-font-family);
+  font-size: 0.9rem;
+  font-weight: 500 !important;
+  font-style: normal;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background: var(--marca-50);
+  color: var(--marca) !important;
+}
+
+.dropdown-item.text-danger {
+  color: var(--marca) !important;
+}
+
+.dropdown-divider {
+  border-color: var(--gris-100);
+  margin: 0.35rem 0;
+}
+
+/* ---------- Header del panel admin ---------- */
+#fondo_admin header {
+  background: var(--gris-900);
+  border-bottom-color: var(--gris-800);
+}
+
+#fondo_admin header::before {
+  content: "Panel de administración";
+  background: var(--marca);
+  color: #fff;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+#fondo_admin .navbar-brand {
+  color: #fff !important;
+}
+
+#fondo_admin .nav-link {
+  color: var(--gris-300) !important;
+}
+
+#fondo_admin .nav-link:hover,
+#fondo_admin .nav-link.show {
+  color: #fff !important;
+  background: var(--gris-800);
+}
+
+#fondo_admin .navbar-toggler {
+  border-color: var(--gris-700) !important;
+  filter: invert(1);
+}
+
+/* =========================================================
+   Títulos y textos
+   ========================================================= */
+h1.montserrat-bold {
+  margin: 0 0 1.5rem;
+  color: var(--gris-900);
+  font-size: clamp(1.75rem, 1.3rem + 1.4vw, 2.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+h2.montserrat-bold {
+  margin: 0 0 1rem;
+  color: var(--gris-900);
+  font-size: clamp(1.3rem, 1.1rem + 0.6vw, 1.6rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+h3.montserrat-bold,
+h3.montserrat-regular {
+  color: var(--gris-900);
+  font-size: clamp(1.1rem, 1rem + 0.4vw, 1.35rem);
+  font-weight: 700;
+}
+
+h4.montserrat-bold,
+h4.montserrat-regular {
+  color: var(--gris-900);
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+h5.montserrat-regular {
+  color: var(--gris-700);
+  font-size: 1rem;
+}
+
+p.montserrat-regular,
+ul.montserrat-regular {
+  color: var(--gris-600);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+/* ---------- Hero de la página de inicio ---------- */
+/* el h1 de inicio es el único centrado dentro de una columna, lo convierto en el hero */
+.col-12.text-center > h1.montserrat-bold {
+  position: relative;
+  overflow: hidden;
+  margin: 0 0 2.5rem;
+  padding: 3rem 1.5rem 2.75rem;
+  background:
+    radial-gradient(circle at 92% 0%, var(--marca-100), transparent 40%),
+    radial-gradient(circle at 5% 100%, #fef3c7, transparent 40%),
+    #fff;
+  border: 1px solid var(--gris-200);
+  border-radius: 1.5rem;
+  box-shadow: var(--sombra);
+  font-size: clamp(2rem, 1.4rem + 2.2vw, 3.25rem);
+  font-weight: 900;
+}
+
+.col-12.text-center > h1.montserrat-bold::before {
+  content: "Tu tienda online";
+  display: table;
+  margin: 0 auto 1rem;
+  padding: 0.3rem 0.85rem;
+  background: var(--marca-50);
+  border: 1px solid var(--marca-200);
+  border-radius: 999px;
+  color: var(--marca-oscuro);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.col-12.text-center > h1.montserrat-bold::after {
+  content: "Encontrá todo lo que necesitás en un solo lugar: publicá, comprá y seguí tus envíos.";
+  display: block;
+  max-width: 36rem;
+  margin: 0.85rem auto 0;
+  color: var(--gris-600);
+  font-size: clamp(1rem, 0.95rem + 0.3vw, 1.15rem);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.6;
+}
+
+/* =========================================================
+   Botones
+   Bootstrap arma cada variante con variables --bs-btn-*,
+   así que alcanza con redefinir esas variables.
+   ========================================================= */
+.btn {
+  --bs-btn-padding-x: 1.1rem;
+  --bs-btn-padding-y: 0.55rem;
+  --bs-btn-font-weight: 600;
+  --bs-btn-font-size: 0.925rem;
+  --bs-btn-border-radius: var(--radio-chico);
+  --bs-btn-focus-box-shadow: 0 0 0 3px rgba(229, 37, 42, 0.25);
+  /* el .btn "pelado" que usan muchas páginas queda como botón principal */
+  --bs-btn-color: #fff;
+  --bs-btn-bg: var(--marca);
+  --bs-btn-border-color: var(--marca);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--marca-oscuro);
+  --bs-btn-hover-border-color: var(--marca-oscuro);
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: var(--marca-oscuro);
+  --bs-btn-active-border-color: var(--marca-oscuro);
+  --bs-btn-disabled-color: #fff;
+  --bs-btn-disabled-bg: var(--gris-400);
+  --bs-btn-disabled-border-color: var(--gris-400);
+  font-family: var(--bs-body-font-family);
+  font-style: normal;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+  transition: background-color var(--transicion), border-color var(--transicion), color var(--transicion),
+    box-shadow var(--transicion), transform var(--transicion);
+}
+
+.btn:hover {
+  box-shadow: 0 6px 14px -6px rgba(229, 37, 42, 0.55);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn-sm {
+  --bs-btn-padding-x: 0.75rem;
+  --bs-btn-padding-y: 0.35rem;
+  --bs-btn-font-size: 0.8rem;
+  --bs-btn-border-radius: 0.55rem;
+}
+
+.btn-primary {
+  --bs-btn-bg: var(--marca);
+  --bs-btn-border-color: var(--marca);
+  --bs-btn-hover-bg: var(--marca-oscuro);
+  --bs-btn-hover-border-color: var(--marca-oscuro);
+  --bs-btn-active-bg: var(--marca-oscuro);
+  --bs-btn-active-border-color: var(--marca-oscuro);
+}
+
+.btn-success {
+  --bs-btn-bg: var(--verde);
+  --bs-btn-border-color: var(--verde);
+  --bs-btn-hover-bg: var(--verde-oscuro);
+  --bs-btn-hover-border-color: var(--verde-oscuro);
+  --bs-btn-active-bg: var(--verde-oscuro);
+  --bs-btn-active-border-color: var(--verde-oscuro);
+  --bs-btn-focus-box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.25);
+}
+
+.btn-success:hover {
+  box-shadow: 0 6px 14px -6px rgba(5, 150, 105, 0.55);
+}
+
+.btn-danger {
+  --bs-btn-color: var(--marca);
+  --bs-btn-bg: var(--marca-50);
+  --bs-btn-border-color: var(--marca-200);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--marca);
+  --bs-btn-hover-border-color: var(--marca);
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: var(--marca-oscuro);
+  --bs-btn-active-border-color: var(--marca-oscuro);
+  --bs-btn-disabled-color: var(--gris-500);
+  --bs-btn-disabled-bg: var(--gris-100);
+  --bs-btn-disabled-border-color: var(--gris-200);
+}
+
+.btn-warning {
+  --bs-btn-color: #92400e;
+  --bs-btn-bg: #fef3c7;
+  --bs-btn-border-color: #fde68a;
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--ambar);
+  --bs-btn-hover-border-color: var(--ambar);
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: #b45309;
+  --bs-btn-active-border-color: #b45309;
+  --bs-btn-focus-box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.25);
+}
+
+.btn-warning:hover {
+  box-shadow: 0 6px 14px -6px rgba(217, 119, 6, 0.55);
+}
+
+.btn-secondary {
+  --bs-btn-color: var(--gris-700);
+  --bs-btn-bg: #fff;
+  --bs-btn-border-color: var(--gris-300);
+  --bs-btn-hover-color: var(--gris-900);
+  --bs-btn-hover-bg: var(--gris-100);
+  --bs-btn-hover-border-color: var(--gris-300);
+  --bs-btn-active-color: var(--gris-900);
+  --bs-btn-active-bg: var(--gris-200);
+  --bs-btn-active-border-color: var(--gris-300);
+  --bs-btn-focus-box-shadow: 0 0 0 3px rgba(100, 116, 139, 0.25);
+}
+
+.btn-secondary:hover,
+.btn-danger:not(:hover) {
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--marca);
+  --bs-btn-bg: #fff;
+  --bs-btn-border-color: var(--marca);
+  --bs-btn-hover-color: var(--marca-oscuro);
+  --bs-btn-hover-bg: var(--marca-50);
+  --bs-btn-hover-border-color: var(--marca-oscuro);
+  --bs-btn-active-color: var(--marca-oscuro);
+  --bs-btn-active-bg: var(--marca-100);
+  --bs-btn-active-border-color: var(--marca-oscuro);
+}
+
+.btn-close:focus {
+  box-shadow: 0 0 0 3px rgba(229, 37, 42, 0.25);
+}
+
+/* =========================================================
+   Tarjetas
+   ========================================================= */
+.card {
+  background: #fff;
+  border: 1px solid var(--gris-200);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  overflow: hidden;
+  color: var(--gris-800);
+}
+
+.card-title {
+  color: var(--gris-900);
+  font-weight: 700;
+}
+
+/* ---------- Tarjeta de producto (inicio, categorías y búsqueda) ---------- */
+article > .card {
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 1.5rem);
+  /* el fondo gris se ve detrás de la foto; las fotos con fondo blanco se funden con él */
+  background: var(--gris-50);
+  transition: transform var(--transicion), box-shadow var(--transicion), border-color var(--transicion);
+}
+
+article > .card:hover {
+  transform: translateY(-4px);
+  border-color: var(--gris-300);
+  box-shadow: var(--sombra-alta);
+}
+
+/* las imágenes traían height y object-fit inline: los piso para mostrar el producto entero */
+article > .card .card-img-top {
+  height: 210px !important;
+  padding: 1.25rem;
+  object-fit: contain !important;
+  mix-blend-mode: multiply;
+  border-bottom: 1px solid var(--gris-100);
+  transition: transform 0.3s ease;
+}
+
+article > .card:hover .card-img-top {
+  transform: scale(1.04);
+}
+
+article > .card .card-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 1.25rem 1.25rem 1.35rem;
+  background: #fff;
+  text-align: left !important;
+}
+
+article > .card .card-title {
+  display: -webkit-box;
+  min-height: 2.6em;
+  margin-bottom: 0.5rem;
+  overflow: hidden;
+  font-size: 1.02rem;
+  line-height: 1.3;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  transition: color var(--transicion);
+}
+
+article > .card:hover .card-title {
+  color: var(--marca);
+}
+
+article > .card .card-text {
+  margin-bottom: 1rem;
+  color: var(--gris-900);
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+article > .card .card-text::after {
+  content: "Hasta 3 cuotas sin interés";
+  display: block;
+  margin-top: 0.15rem;
+  color: var(--verde);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+article > .card .btn {
+  width: 100%;
+  margin-top: auto;
+  padding: 0.7rem 1rem;
+  border-radius: var(--radio-chico);
+}
+
+article > .card .btn::after {
+  content: " \2192";
+}
+
+/* ---------- Tarjetas de la compra y el envío ---------- */
+.compra-card {
+  width: 100% !important;
+  height: 100%;
+  margin: 0 !important;
+  border-radius: var(--radio) !important;
+}
+
+.compra-card img {
+  padding: 0.5rem;
+  background: var(--gris-50) !important;
+  border-radius: var(--radio-chico) !important;
+}
+
+.compra-card .card-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.compra-card .card-text {
+  color: var(--gris-600);
+}
+
+.compra-card form.formulario-usuario {
+  margin: 0;
+  padding: 0.5rem;
+  border: 0;
+  box-shadow: none;
+}
+
+/* ---------- Métodos de pago dentro del perfil ---------- */
+#metodos-pago .card {
+  border-color: var(--gris-200);
+  box-shadow: none;
+}
+
+#metodos-pago .card .card-title {
+  font-size: 1rem;
+}
+
+/* =========================================================
+   Modal de producto
+   ========================================================= */
+/* Bootstrap le da al modal el mismo color que el body (gris): lo quiero blanco */
+.modal {
+  --bs-modal-bg: #fff;
+}
+
+.modal-content {
+  border: 0;
+  border-radius: 1.25rem;
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.35);
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--gris-100);
+}
+
+.modal-title {
+  color: var(--gris-900);
+  font-size: 1.3rem;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em;
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-body .col-md-6:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 280px;
+  padding: 1rem;
+  background: var(--gris-50);
+  border-radius: var(--radio);
+}
+
+.modal-body .col-md-6:first-child img {
+  mix-blend-mode: multiply;
+}
+
+.modal-body .col-md-6:last-child {
+  padding: 0.5rem 0.25rem 0 1.5rem;
+}
+
+.modal-body h4.text-success {
+  color: var(--gris-900) !important;
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.modal-body h4.text-success::after {
+  content: "Hasta 3 cuotas sin interés con tarjeta";
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--verde);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.modal-body p {
+  color: var(--gris-600);
+  line-height: 1.6;
+}
+
+.modal-body p strong {
+  color: var(--gris-900);
+}
+
+.modal-body small {
+  display: inline-block;
+  padding: 0.25rem 0.7rem;
+  background: var(--gris-100);
+  border-radius: 999px;
+  color: var(--gris-700);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.modal-body hr {
+  border-color: var(--gris-200);
+  opacity: 1;
+}
+
+.modal-body .btn {
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  width: 2.2rem;
+  height: 2.2rem;
+  background-color: rgba(15, 23, 42, 0.55);
+  background-size: 1rem;
+  border-radius: 50%;
+}
+
+/* =========================================================
+   Formularios
+   ========================================================= */
+form.formulario-usuario {
+  margin: 0 0 1.5rem;
+  padding: 2rem;
+  background: #fff !important;
+  border: 1px solid var(--gris-200);
+  border-radius: 1.25rem;
+  box-shadow: var(--sombra);
+  color: var(--gris-800) !important;
+  font-family: var(--bs-body-font-family);
+}
+
+.formulario-usuario label,
+.form-label {
+  margin-bottom: 0.4rem;
+  padding: 0;
+  color: var(--gris-700);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.formulario-usuario label:not(.primero) {
+  margin-top: 1rem;
+}
+
+.formulario-usuario label.primero,
+.formulario-usuario .form-floating > label {
+  margin-top: 0;
+}
+
+.form-control,
+.form-select,
+.formulario-usuario .form-control,
+.formulario-usuario .form-select {
+  padding: 0.65rem 0.9rem;
+  background-color: #fff !important;
+  border: 1px solid var(--gris-300);
+  border-radius: var(--radio-chico);
+  color: var(--gris-900) !important;
+  font-size: 0.95rem;
+  transition: border-color var(--transicion), box-shadow var(--transicion);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--marca);
+  box-shadow: 0 0 0 3px rgba(229, 37, 42, 0.15);
+}
+
+.form-control::placeholder {
+  color: var(--gris-400) !important;
+}
+
+textarea.form-control {
+  min-height: 7rem;
+}
+
+/* login y registro usan form-floating con los labels vacíos:
+   muestro el placeholder como texto guía y escondo el label vacío */
+.formulario-usuario .form-floating > .form-control {
+  height: auto;
+  min-height: 3.1rem;
+  padding: 0.8rem 1rem;
+}
+
+.formulario-usuario .form-floating > .form-control::placeholder {
+  color: var(--gris-400) !important;
+}
+
+.formulario-usuario .form-floating > label:empty {
+  display: none;
+}
+
+.formulario-usuario input[type="submit"],
+.formulario-usuario button[type="submit"] {
+  margin-top: 1.25rem;
+  padding: 0.75rem 1rem;
+}
+
+.formulario-usuario .row:has(> .col-12 > .form-floating) + .row:has(.btn) .btn {
+  margin-top: 0.5rem;
+}
+
+/* forms chicos de edición del perfil */
+#datos-perfil form {
+  background: var(--gris-50) !important;
+  border: 1px solid var(--gris-200);
+  border-radius: var(--radio-chico) !important;
+}
+
+/* =========================================================
+   Paneles y secciones
+   ========================================================= */
+#producto-detalle,
+#comentarios,
+#datos-perfil,
+#metodos-pago {
+  padding: 1.75rem !important;
+  background: #fff !important;
+  border: 1px solid var(--gris-200) !important;
+  border-radius: 1.25rem !important;
+  box-shadow: var(--sombra) !important;
+}
+
+#comentarios,
+#metodos-pago {
+  max-height: 560px;
+  overflow-y: auto;
+}
+
+#datos-perfil > .row {
+  align-items: center;
+  margin: 0 0 0.75rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--gris-100);
+}
+
+#datos-perfil > .row p {
+  margin: 0;
+}
+
+#comentario-respuesta {
+  padding: 1rem;
+  background: var(--gris-50) !important;
+  border: 1px solid var(--gris-200);
+  border-radius: var(--radio-chico);
+  color: var(--gris-800) !important;
+}
+
+/* los bloques grises venían con un fondo inline semitransparente: los paso a tarjeta blanca */
+[style*="rgba(0, 0, 0, 0.2)"] {
+  padding: 2rem !important;
+  background: #fff !important;
+  border: 1px solid var(--gris-200);
+  border-radius: 1.25rem !important;
+  box-shadow: var(--sombra);
+}
+
+[style*="rgba(0, 0, 0, 0.2)"] .text-white,
+[style*="rgba(255, 255, 255, 0.1)"] .text-white {
+  color: var(--marca) !important;
+}
+
+[style*="rgba(255, 255, 255, 0.1)"] {
+  background: var(--gris-50) !important;
+  border: 1px dashed var(--gris-300) !important;
+  border-radius: var(--radio-chico);
+}
+
+[style*="rgba(255, 255, 255, 0.1)"] p.text-white {
+  color: var(--gris-700) !important;
+}
+
+/* en categoría y búsqueda ese bloque es una bajada corta: lo achico */
+section > article.mb-4 > [style*="rgba(0, 0, 0, 0.2)"] {
+  padding: 1rem 1.25rem !important;
+  border-left: 4px solid var(--marca);
+}
+
+section > article.mb-4 > [style*="rgba(0, 0, 0, 0.2)"] p.montserrat-regular {
+  font-size: 0.95rem;
+}
+
+/* imágenes que no existen en /imgs: las oculto para que no se vea el ícono roto */
+img[src$="comentario.png"],
+img[src$="/admin.png"],
+img[src$="perfil_admin.png"] {
+  display: none;
+}
+
+/* en Nosotros la columna de esa imagen queda vacía: la escondo */
+.col-3:has(> img[src$="comentario.png"]) {
+  display: none;
+}
+
+/* y en el panel admin pongo un ícono decorativo en su lugar */
+figure:has(> img[src$="/admin.png"]),
+figure:has(> img[src$="perfil_admin.png"]) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+  margin: 1rem 0;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23e5252a' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' viewBox='0 0 24 24'%3E%3Cpath d='M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z'/%3E%3C/svg%3E") center / 6rem no-repeat,
+    radial-gradient(circle, var(--marca-50) 0 45%, transparent 46%);
+}
+
+/* =========================================================
+   Tablas
+   ========================================================= */
+.table-responsive {
+  border-radius: var(--radio);
+}
+
+.table {
+  --bs-table-bg: #fff;
+  --bs-table-striped-bg: var(--gris-50);
+  --bs-table-hover-bg: var(--marca-50);
+  --bs-table-border-color: var(--gris-100);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+  border: 1px solid var(--gris-200);
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+}
+
+.table th,
+.table td {
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid var(--gris-100);
+  color: var(--gris-700);
+  font-family: var(--bs-body-font-family);
+  font-size: 0.925rem;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.table thead th,
+.table thead.table-dark th {
+  --bs-table-bg: var(--gris-50);
+  --bs-table-color: var(--gris-500);
+  background: var(--gris-50);
+  border-bottom: 1px solid var(--gris-200);
+  color: var(--gris-500);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.table td.primera_col {
+  color: var(--gris-900);
+  font-weight: 700;
+}
+
+.table .btn {
+  margin: 0.15rem 0.1rem;
+}
+
+.badge {
+  padding: 0.4em 0.75em;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+/* =========================================================
+   Alertas
+   ========================================================= */
+.alert {
+  border: 1px solid transparent;
+  border-left-width: 4px;
+  border-radius: var(--radio-chico);
+  font-size: 0.925rem;
+  font-weight: 500;
+}
+
+.alert-success {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  border-left-color: var(--verde);
+  color: #065f46;
+}
+
+.alert-danger {
+  background: var(--marca-50);
+  border-color: var(--marca-200);
+  border-left-color: var(--marca);
+  color: #991b1b;
+}
+
+.alert-warning {
+  background: #fffbeb;
+  border-color: #fde68a;
+  border-left-color: var(--ambar);
+  color: #92400e;
+}
+
+.alert-info {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  border-left-color: #2563eb;
+  color: #1e40af;
+}
+
+/* =========================================================
+   Footer
+   ========================================================= */
+footer {
+  margin-top: 0 !important;
+  padding: 2.5rem 1rem 2rem !important;
+  background: var(--gris-900) !important;
+  border-top: 1px solid var(--gris-800);
+  color: var(--gris-400) !important;
+}
+
+/* marca y bajada armadas desde CSS para no tocar el footer */
+footer::before {
+  content: "TiendApp";
+  display: block;
+  margin-bottom: 0.35rem;
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  text-align: center;
+}
+
+footer .row::before {
+  content: "Tu tienda multirrubro: publicá tus productos, comprá en cuotas y seguí cada envío.";
+  display: block;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--gris-800);
+  color: var(--gris-400);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+footer p,
+footer p.montserrat-bold {
+  display: inline-block;
+  margin-bottom: 0;
+  color: var(--gris-500) !important;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+footer p br {
+  display: none;
+}
+
+/* =========================================================
+   Celular
+   ========================================================= */
+@media (max-width: 991.98px) {
+  .navbar-collapse {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--gris-100);
+  }
+
+  #fondo_admin .navbar-collapse {
+    border-top-color: var(--gris-800);
+  }
+
+  .navbar form[role="search"] {
+    margin: 0.75rem 0 0.25rem;
+  }
+
+  .navbar form[role="search"] .form-control {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .modal-body .col-md-6:last-child {
+    padding: 1.25rem 0.75rem 0;
+  }
+}
+
+@media (max-width: 575.98px) {
+  header::before {
+    content: "Hasta 3 cuotas sin interés con tarjeta";
+  }
+
+  main {
+    padding-top: 1.25rem;
+  }
+
+  form.formulario-usuario,
+  [style*="rgba(0, 0, 0, 0.2)"] {
+    padding: 1.25rem !important;
+  }
+
+  .col-12.text-center > h1.montserrat-bold {
+    padding: 2rem 1rem;
+  }
+
+  article > .card .card-img-top {
+    height: 190px !important;
+  }
+}
