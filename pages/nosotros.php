@@ -28,7 +28,7 @@
                         <ul class="montserrat-regular mb-0">
                             <li>Gestionar publicaciones de productos bajo una categorización estructurada.</li>
                             <li>Realizar adquisiciones de bienes de forma directa y transparente.</li>
-                            <li>Participar en procesos de retroalimentación mediante sistemas de comentarios.</li>
+                            <li>Participar en procesos de retroalimentación mediante el formulario de sugerencias.</li>
                             <li>Coordinar la logística de entrega y recepción de productos de manera efectiva.</li>
                         </ul>
                     </div>
@@ -51,10 +51,7 @@
 
             <article class="mb-4">
                 <div class="row align-items-center g-0 p-4" style="background-color: rgba(0, 0, 0, 0.2); border-radius: 8px;">
-                    <div class="col-3 col-md-4 col-lg-2 text-center">
-                        <img src="../imgs/comentario.png" alt="Sugerencias" class="img-fluid" style="max-height: 150px; width: auto;">
-                    </div>
-                    <div class="col-9 col-md-8 col-lg-10">
+                    <div class="col-12">
                         <h3 class="montserrat-bold">Política de Gestión y Mejora Continua</h3>
                         <p class="montserrat-regular mb-0">
                             La integridad estructural y visual de TiendApp es gestionada de manera centralizada para garantizar la estabilidad del servicio y la protección de los datos. Promovemos activamente una política de mejora continua basada en el feedback de nuestros usuarios. Sus sugerencias son el motor de nuestra evolución tecnológica. Para canalizar sus ideas, disponemos de un canal oficial en nuestra sección de <a href="contacto.php" class="text-white fw-bold">Contactos</a>.

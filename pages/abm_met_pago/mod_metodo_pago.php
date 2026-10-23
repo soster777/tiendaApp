@@ -1,34 +1,21 @@
 <?php
-include_once("../../components/header.php");
 include_once("../../components/config/config.php");
+include_once("../../components/permisos.php");
 
-$id_usuario = $_SESSION['id_usuario'] ?? 0;
+// los chequeos van antes del header para poder redirigir
+$id_usuario = requiere_login("../login.php");
 $metodo_id = intval($_GET['id'] ?? 0);
 
-if (!$id_usuario) {
-    header("Location: ../login.php");
+$stmt = mysqli_prepare($con, "SELECT * FROM metodos_pagos_usuarios WHERE id_metodo_pago_usuario = ? AND fk_usuario = ? LIMIT 1");
+mysqli_stmt_bind_param($stmt, "ii", $metodo_id, $id_usuario);
+mysqli_stmt_execute($stmt);
+$res = mysqli_stmt_get_result($stmt);
+if (mysqli_num_rows($res) === 0) {
+    header("Location: ../perfil.php");
     exit;
 }
 
-if (!$metodo_id) {
-    print "<div class='container-fluid mt-4'>
-            <div class='alert alert-warning'>ID de método inválido.</div>
-            <a href='../perfil.php' class='btn btn-secondary mt-3'>Volver al perfil</a>
-          </div>";
-    exit;
-}
-
-$sql = "SELECT * FROM metodos_pagos_usuarios 
-        WHERE id_metodo_pago_usuario='$metodo_id' AND fk_usuario='$id_usuario' LIMIT 1";
-$res = mysqli_query($con, $sql);
-if (!$res || mysqli_num_rows($res) === 0) {
-    print "<div class='container-fluid mt-4'>
-            <div class='alert alert-warning'>No se encontró este método de pago.</div>
-            <a href='../perfil.php' class='btn btn-secondary mt-3'>Volver al perfil</a>
-          </div>";
-    exit;
-}
-
+include_once("../../components/header.php");
 $metodo = mysqli_fetch_assoc($res);
 ?>
 
@@ -55,21 +42,18 @@ $metodo = mysqli_fetch_assoc($res);
                         <div class="row mb-3">
                             <label class="form-label col-12">Número de tarjeta</label>
                             <div class="col-12">
+                                <!-- solo guardamos los ultimos 4: si lo dejan vacio se mantiene la tarjeta actual -->
                                 <input type="text" name="numero_tarjeta" class="form-control"
-                                    value="<?= htmlspecialchars($metodo['numero_tarjeta']) ?>" required>
+                                    placeholder="Tarjeta terminada en <?= htmlspecialchars($metodo['numero_tarjeta']) ?> (dejar vacío para no cambiarla)"
+                                    pattern="[0-9]{13,19}" inputmode="numeric">
                             </div>
                         </div>
 
                         <div class="row mb-3">
-                            <div class="col-md-6">
+                            <div class="col-12">
                                 <label class="form-label">Vencimiento</label>
                                 <input type="month" name="vencimiento" class="form-control"
                                     value="<?= substr($metodo['vencimiento'], 0, 7) ?>" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Código de seguridad</label>
-                                <input type="text" name="codigo_tarjeta" class="form-control"
-                                    value="<?= htmlspecialchars($metodo['codigo_tarjeta']) ?>" required>
                             </div>
                         </div>
 
@@ -78,7 +62,7 @@ $metodo = mysqli_fetch_assoc($res);
                             <label class="form-label col-12">CBU</label>
                             <div class="col-12">
                                 <input type="text" name="cbu" class="form-control"
-                                    value="<?= htmlspecialchars($metodo['cbu']) ?>" required>
+                                    value="<?= htmlspecialchars($metodo['cbu']) ?>" required pattern="[0-9]{22}" inputmode="numeric">
                             </div>
                         </div>
                     <?php endif; ?>

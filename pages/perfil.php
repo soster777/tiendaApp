@@ -1,10 +1,13 @@
 <?php
-include_once("../components/header.php");
 include_once("../components/config/config.php");
+include_once("../components/permisos.php");
 
-$id_usuario = $_SESSION['id_usuario'];
+// si no hay sesion va al login (antes mostraba "Undefined array key")
+$id_usuario = requiere_login("login.php");
 
-$res_usuario = mysqli_query($con, "SELECT * FROM usuarios WHERE id_usuario='$id_usuario'");
+include_once("../components/header.php");
+
+$res_usuario = mysqli_query($con, "SELECT * FROM usuarios WHERE id_usuario = $id_usuario");
 if (!$usuario = mysqli_fetch_assoc($res_usuario)) {
     print "<div class='alert alert-danger'>Usuario no encontrado.</div>";
     include_once("../components/footer.php");
@@ -28,6 +31,12 @@ $modificar = isset($_GET['modificar']) ? $_GET['modificar'] : '';
                         <div class="alert alert-danger">La contraseña actual es incorrecta.</div>
                     <?php elseif ($_GET['error'] === 'clave_no_coincide'): ?>
                         <div class="alert alert-warning">Las contraseñas nuevas no coinciden.</div>
+                    <?php elseif ($_GET['error'] === 'mail'): ?>
+                        <div class="alert alert-warning">El mail no tiene un formato válido.</div>
+                    <?php elseif ($_GET['error'] === 'metodo_datos'): ?>
+                        <div class="alert alert-warning">Revisá los datos del método de pago (número de tarjeta, vencimiento o CBU).</div>
+                    <?php elseif ($_GET['error'] === 'metodo_en_uso'): ?>
+                        <div class="alert alert-warning">No podés eliminar ese método porque tiene una compra o un envío pendiente.</div>
                     <?php else: ?>
                         <div class="alert alert-danger">Ocurrió un error al actualizar los datos.</div>
                     <?php endif; ?>
@@ -118,7 +127,7 @@ $modificar = isset($_GET['modificar']) ? $_GET['modificar'] : '';
                     <div class="row mb-3">
                         <div class="col-md-8">
                             <p class="montserrat-regular">
-                                <strong>Ubicación:</strong> <?= htmlspecialchars($usuario['ubicacion']); ?>
+                                <strong>Ubicación:</strong> <?= htmlspecialchars($usuario['ubicacion'] ?? ''); ?>
                             </p>
                         </div>
                         <div class="col-md-4 text-md-end">
@@ -129,7 +138,7 @@ $modificar = isset($_GET['modificar']) ? $_GET['modificar'] : '';
                     <?php if ($modificar === 'ubicacion'): ?>
                         <form action="abm_perfil/perfil_actualizar.php" method="POST" class="mt-2 p-3 bg-light rounded">
                             <input type="hidden" name="campo" value="ubicacion">
-                            <input type="text" name="valor" value="<?= htmlspecialchars($usuario['ubicacion']) ?>" class="form-control mb-2" required>
+                            <input type="text" name="valor" value="<?= htmlspecialchars($usuario['ubicacion'] ?? '') ?>" class="form-control mb-2" required>
                             <button class="btn btn-success">Guardar</button>
                             <a href="perfil.php" class="btn btn-secondary ms-2">Cancelar</a>
                         </form>
@@ -171,17 +180,16 @@ $modificar = isset($_GET['modificar']) ? $_GET['modificar'] : '';
 
                         <div class="card shadow-sm mb-4"> <div class="card-body p-4"> <h5 class="card-title"><?= htmlspecialchars($nombre_metodo); ?></h5>
 
+                                <p class="mb-1"><?= htmlspecialchars($mp['nombre']); ?></p>
+
                                 <?php if ($mp['numero_tarjeta']): ?>
-                                    <p class="mb-1"><strong>Tarjeta:</strong> <?= htmlspecialchars($mp['numero_tarjeta']); ?></p>
-                                    <p class="mb-3"><strong>Vencimiento:</strong> <?= htmlspecialchars($mp['vencimiento']); ?></p>
+                                    <!-- solo se guardan los ultimos 4 numeros -->
+                                    <p class="mb-1"><strong>Tarjeta:</strong> **** **** **** <?= htmlspecialchars(substr($mp['numero_tarjeta'], -4)); ?></p>
+                                    <p class="mb-3"><strong>Vencimiento:</strong> <?= date("m/Y", strtotime($mp['vencimiento'])); ?></p>
                                 <?php endif; ?>
 
                                 <?php if ($mp['cbu']): ?>
                                     <p class="mb-3"><strong>CBU:</strong> <?= htmlspecialchars($mp['cbu']); ?></p>
-                                <?php endif; ?>
-
-                                <?php if ($mp['codigo_tarjeta']): ?>
-                                    <p class="mb-3"><strong>Código:</strong> <?= htmlspecialchars($mp['codigo_tarjeta']); ?></p>
                                 <?php endif; ?>
 
                                 <?php if (!$es_efectivo): ?>
@@ -226,11 +234,11 @@ $modificar = isset($_GET['modificar']) ? $_GET['modificar'] : '';
 
                                 <?php else: ?>
 
-                                    <a href="abm_met_pago/baja_metodo_pago.php?id=<?= $mp['id_metodo_pago_usuario']; ?>"
-                                        onclick="return confirm('¿Estás seguro de que querés eliminar este método?');"
-                                        class="btn btn-sm btn-danger ms-2">
-                                        Eliminar
-                                    </a>
+                                    <form action="abm_met_pago/baja_metodo_pago.php" method="post" class="d-inline"
+                                        onsubmit="return confirm('¿Estás seguro de que querés eliminar este método?');">
+                                        <input type="hidden" name="id" value="<?= intval($mp['id_metodo_pago_usuario']); ?>">
+                                        <button type="submit" class="btn btn-sm btn-danger ms-2">Eliminar</button>
+                                    </form>
 
                                 <?php endif; ?>
                             </div>

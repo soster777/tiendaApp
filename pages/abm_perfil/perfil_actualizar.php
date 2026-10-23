@@ -1,24 +1,22 @@
 <?php
-session_start();
 include_once("../../components/config/config.php");
+include_once("../../components/permisos.php");
 
-if (!isset($_SESSION['id_usuario'])) {
-    print "<div class='alert alert-warning'>Debes iniciar sesión para modificar tu perfil.</div>";
-    exit;
-}
-
-$id_usuario = intval($_SESSION['id_usuario']);
+$id_usuario = requiere_login("/tiendApp/pages/login.php");
 
 if (!isset($_POST['campo'])) {
-    print "<div class='alert alert-danger'>No se especificó el campo a actualizar.</div>";
+    header("Location: ../perfil.php");
     exit;
 }
 
 $campo = $_POST['campo'];
 
-$res_usuario = mysqli_query($con, "SELECT * FROM usuarios WHERE id_usuario='$id_usuario'");
-if (!$usuario = mysqli_fetch_assoc($res_usuario)) {
-    print "<div class='alert alert-danger'>Usuario no encontrado.</div>";
+$stmt = mysqli_prepare($con, "SELECT * FROM usuarios WHERE id_usuario = ?");
+mysqli_stmt_bind_param($stmt, "i", $id_usuario);
+mysqli_stmt_execute($stmt);
+$usuario = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+if (!$usuario) {
+    header("Location: ../perfil.php?error=2");
     exit;
 }
 
@@ -29,32 +27,50 @@ switch ($campo) {
             header("Location: ../perfil.php?modificar=$campo&error=1");
             exit;
         }
-        $valor = mysqli_real_escape_string($con, trim($_POST['valor']));
-        mysqli_query($con, "UPDATE usuarios SET $campo='$valor' WHERE id_usuario='$id_usuario'");
+        // guardo el texto tal cual (se escapa al mostrarlo). Con la consulta preparada no hace
+        // falta mysqli_real_escape_string, que era lo que hacia que el header mostrara O\'Brien
+        $valor = trim($_POST['valor']);
+        if ($campo === 'nombre') {
+            $stmt = mysqli_prepare($con, "UPDATE usuarios SET nombre = ? WHERE id_usuario = ?");
+        } else {
+            $stmt = mysqli_prepare($con, "UPDATE usuarios SET ubicacion = ? WHERE id_usuario = ?");
+        }
+        mysqli_stmt_bind_param($stmt, "si", $valor, $id_usuario);
+        mysqli_stmt_execute($stmt);
         if ($campo === 'nombre') {
             $_SESSION['nombre'] = $valor;
         }
         header("Location: ../perfil.php?ok=1");
         exit;
-        break;
 
     case 'mail':
         if (!isset($_POST['valor']) || trim($_POST['valor']) === '') {
             header("Location: ../perfil.php?modificar=mail&error=1");
             exit;
         }
-        $valor = mysqli_real_escape_string($con, trim($_POST['valor']));
+        $valor = trim($_POST['valor']);
 
-        $check_mail = mysqli_query($con, "SELECT * FROM usuarios WHERE mail='$valor' AND id_usuario!='$id_usuario'");
-        if (mysqli_num_rows($check_mail) > 0) {
+        // antes no se validaba el formato del mail nuevo
+        if (!filter_var($valor, FILTER_VALIDATE_EMAIL)) {
+            header("Location: ../perfil.php?modificar=mail&error=mail");
+            exit;
+        }
+
+        $stmt = mysqli_prepare($con, "SELECT id_usuario FROM usuarios WHERE mail = ? AND id_usuario != ?");
+        mysqli_stmt_bind_param($stmt, "si", $valor, $id_usuario);
+        mysqli_stmt_execute($stmt);
+        if (mysqli_num_rows(mysqli_stmt_get_result($stmt)) > 0) {
             header("Location: ../perfil.php?modificar=mail&mail_exist=1");
             exit;
         }
 
-        mysqli_query($con, "UPDATE usuarios SET mail='$valor' WHERE id_usuario='$id_usuario'");
+        $stmt = mysqli_prepare($con, "UPDATE usuarios SET mail = ? WHERE id_usuario = ?");
+        mysqli_stmt_bind_param($stmt, "si", $valor, $id_usuario);
+        mysqli_stmt_execute($stmt);
+        // tambien actualizo la sesion, que seguia con el mail viejo
+        $_SESSION['mail'] = $valor;
         header("Location: ../perfil.php?ok=1");
         exit;
-        break;
 
     case 'contrasena':
         if (!isset($_POST['actual'], $_POST['nuevo'], $_POST['nuevo_rep'])) {
@@ -62,6 +78,8 @@ switch ($campo) {
             exit;
         }
 
+        // la contraseña se usa tal cual en todos lados (login, registro y aca), sin htmlspecialchars:
+        // asi una clave con & o < funciona igual al registrarse, al entrar y al cambiarla
         $actual = md5($_POST['actual']);
         $nuevo = $_POST['nuevo'];
         $nuevo_rep = $_POST['nuevo_rep'];
@@ -82,9 +100,8 @@ switch ($campo) {
         mysqli_stmt_execute($stmt);
         header("Location: ../perfil.php?ok=1");
         exit;
-        break;
 
     default:
-        print "<div class='alert alert-danger'>Campo no válido.</div>";
+        header("Location: ../perfil.php?error=2");
         exit;
 }

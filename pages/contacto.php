@@ -41,9 +41,9 @@ $id_usuario = $_SESSION['id_usuario'] ?? 0;
     <div class="alert alert-dark mt-3" style="background: rgba(255, 255, 255, 0.1); border: 1px dashed rgba(255, 255, 255, 0.3);">
         <p class="montserrat-regular text-white mb-0">
             Para poder escribir un mensaje o enviar una propuesta, es necesario 
-            <a href="../login.php" class="text-white fw-bold">Iniciar sesión</a> 
+            <a href="login.php" class="text-white fw-bold">Iniciar sesión</a> 
             o 
-            <a href="../registro.php" class="text-white fw-bold">Registrarse</a>. 
+            <a href="registro.php" class="text-white fw-bold">Registrarse</a>. 
             Si tienes dudas, puedes ir a 
             <a href="contacto.php" class="text-white fw-bold">Contactos</a>.
         </p>

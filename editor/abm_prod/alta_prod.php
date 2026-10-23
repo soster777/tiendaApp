@@ -6,7 +6,9 @@ $id_usuario = requiere_login("../../pages/login.php");
 
 $errores = [];
 
-$archivosValidos = ["JPG", "JPEG", "PNG", "MP4", "WEBM", "OGG"];
+// mismas extensiones que la tabla tipos_archivos (antes aceptaba WEBM y OGG, que no estan en la tabla:
+// el archivo se subia pero no quedaba registrado)
+$archivosValidos = ["JPG", "JPEG", "PNG", "MP4", "MOV", "MPEG", "AVI"];
 $imagenesObligatorias = ["JPG", "JPEG", "PNG"];
 
 if (
@@ -14,9 +16,10 @@ if (
     isset($_FILES['media'])
 ) {
 
-    $nombre = htmlspecialchars($_POST['nombre']);
+    // guardo el texto tal cual y lo escapo recien al mostrarlo
+    $nombre = trim($_POST['nombre']);
     $categoria = intval($_POST['categoria']);
-    $descripcion = htmlspecialchars($_POST['descripcion']);
+    $descripcion = trim($_POST['descripcion']);
     $stock = intval($_POST['stock']);
     $precio = floatval($_POST['precio']);
     // el usuario lo saco de la sesion y no del form, asi no se puede publicar a nombre de otro
@@ -57,6 +60,11 @@ if (
         exit;
     }
 
+    if ($nombre === '' || $precio <= 0 || $stock < 1) {
+        header("Location: ../publicar.php?error=" . urlencode("Revisá los datos: el nombre es obligatorio, el precio tiene que ser mayor a 0 y el stock al menos 1."));
+        exit;
+    }
+
     $stmt = mysqli_prepare($con, "INSERT INTO productos (nombre, descripcion, precio, stock, fecha_publicacion, fk_categoria, fk_usuario, fk_estado_producto)
                  VALUES (?, ?, ?, ?, NOW(), ?, ?, 1)");
     mysqli_stmt_bind_param($stmt, "ssdiii", $nombre, $descripcion, $precio, $stock, $categoria, $usuario);
@@ -91,5 +99,6 @@ if (
     header("Location: ../publicar.php?dato=ok");
     exit;
 } else {
-    print "Faltan datos obligatorios.";
+    header("Location: ../publicar.php?error=noimg");
+    exit;
 }

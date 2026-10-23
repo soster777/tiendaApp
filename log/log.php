@@ -5,7 +5,7 @@ include_once("../components/config/config.php");
 if (isset($_POST["mail"]) && isset($_POST["contrasena"])) {
 
     $mail = trim($_POST["mail"]);
-    $contrasena = htmlspecialchars($_POST["contrasena"]);
+    $contrasena = $_POST["contrasena"];
 
     // consulta preparada, asi no se puede meter SQL desde el form
     $stmt = mysqli_prepare($con, "SELECT * FROM `usuarios` WHERE `mail` = ? AND `contrasena` = MD5(?)");

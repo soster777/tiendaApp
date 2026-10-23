@@ -36,13 +36,10 @@ if (isset($_FILES['archivo']) && $_FILES['archivo']['tmp_name']) {
 }
 
 if (empty($errores)) {
-    $comentarioSQL = mysqli_real_escape_string($con, $comentario);
-    $archivoSQL = $nombreArchivo ? "'" . mysqli_real_escape_string($con, $nombreArchivo) . "'" : "NULL";
-
-    $sql = "INSERT INTO sugerencias (sugerencia, archivo, fk_usuario, fk_estado_sugerencia)
-            VALUES ('$comentarioSQL', $archivoSQL, $id_usuario, 1)";
-    
-    mysqli_query($con, $sql);
+    $comentario = trim($comentario);
+    $stmt = mysqli_prepare($con, "INSERT INTO sugerencias (sugerencia, archivo, fk_usuario, fk_estado_sugerencia) VALUES (?, ?, ?, 1)");
+    mysqli_stmt_bind_param($stmt, "ssi", $comentario, $nombreArchivo, $id_usuario);
+    mysqli_stmt_execute($stmt);
 
     header("Location: ../contacto.php?dato=ok");
     exit;

@@ -1,15 +1,12 @@
 <?php
-include_once("../components/header_admin.php");
 include_once("../components/config/config.php");
+include_once("../components/permisos.php");
 
-if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'admin') {
-    header("Location: ../index.php");
-    exit();
-}
+$id_usuario = requiere_admin();
 
-$id_usuario = $_SESSION['id_usuario'];
+include_once("../components/header_admin.php");
 
-$res_usuario = mysqli_query($con, "SELECT * FROM usuarios WHERE id_usuario='$id_usuario'");
+$res_usuario = mysqli_query($con, "SELECT * FROM usuarios WHERE id_usuario = $id_usuario");
 if (!$usuario = mysqli_fetch_assoc($res_usuario)) {
     print "<div class='alert alert-danger'>Usuario no encontrado.</div>";
     include_once("../components/footer.php");
@@ -106,7 +103,7 @@ $modificar = isset($_GET['modificar']) ? $_GET['modificar'] : '';
                     <div class="row">
                         <div class="col-md-8">
                             <p class="montserrat-regular">
-                                <strong>Ubicación:</strong> <?= htmlspecialchars($usuario['ubicacion']); ?>
+                                <strong>Ubicación:</strong> <?= htmlspecialchars($usuario['ubicacion'] ?? ''); ?>
                             </p>
                         </div>
                         <div class="col-md-4 text-md-end">
@@ -116,7 +113,7 @@ $modificar = isset($_GET['modificar']) ? $_GET['modificar'] : '';
                     <?php if ($modificar === 'ubicacion'): ?>
                         <form action="abm_perfil/perfil_actualizar.php" method="POST" class="mt-2">
                             <input type="hidden" name="campo" value="ubicacion">
-                            <input type="text" name="valor" value="<?= htmlspecialchars($usuario['ubicacion']) ?>" class="form-control mb-2">
+                            <input type="text" name="valor" value="<?= htmlspecialchars($usuario['ubicacion'] ?? '') ?>" class="form-control mb-2">
                             <button class="btn btn-success">Guardar</button>
                             <a href="perfil.php" class="btn btn-secondary ms-2">Cancelar</a>
                         </form>
@@ -125,9 +122,6 @@ $modificar = isset($_GET['modificar']) ? $_GET['modificar'] : '';
                 </section>
             </div>
             <div class="col-12 col-md-3 col-lg-5">
-                <figure>
-                    <img src="../imgs/perfil_admin.png" alt="perfil" class="img-fluid mx-auto d-block">
-                </figure>
             </div>
         </div>
     </div>

@@ -302,8 +302,8 @@ CREATE TABLE `metodos_pagos_usuarios` (
 --
 
 INSERT INTO `metodos_pagos_usuarios` (`id_metodo_pago_usuario`, `nombre`, `numero_tarjeta`, `vencimiento`, `codigo_tarjeta`, `cbu`, `fk_metodo_pago`, `fk_usuario`) VALUES
-(1, 'American Express', 2147483647, '2026-06-01', 4115, NULL, 1, 3),
-(2, 'Mercado pago', NULL, NULL, NULL, 1234567890, 4, 3);
+(1, 'American Express', '1005', '2028-06-01', NULL, NULL, 1, 3),
+(2, 'Mercado pago', NULL, NULL, NULL, '0000003100012345678901', 4, 3);
 
 -- --------------------------------------------------------
 
@@ -472,7 +472,7 @@ CREATE TABLE `usuarios` (
 
 INSERT INTO `usuarios` (`id_usuario`, `nombre`, `mail`, `contrasena`, `ubicacion`, `fk_rol`) VALUES
 (1, 'Admin', 'admin@gmail.com', '81dc9bdb52d04dc20036dbd8313ed055', NULL, 1),
-(2, 'a', 'a@a.com', '81dc9bdb52d04dc20036dbd8313ed055', NULL, 2),
+(2, 'Martín', 'martin@gmail.com', '81dc9bdb52d04dc20036dbd8313ed055', 'Av. Corrientes 1234, CABA', 2),
 (3, 'Laura', 'laura@gmail.com', '81dc9bdb52d04dc20036dbd8313ed055', 'Callao 1020 - 3ro. D', 2);
 
 --

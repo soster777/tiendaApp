@@ -1,8 +1,8 @@
 <?php
-include_once("../../components/header.php");
 include_once("../../components/config/config.php");
 include_once("../../components/permisos.php");
 
+// los chequeos van antes del header para que las redirecciones funcionen
 $id_usuario = requiere_login("../../pages/login.php");
 
 if (!isset($_GET['id'])) {
@@ -26,6 +26,8 @@ $archivos = mysqli_query($con, $consulta_archivos);
 
 $consulta_cat = "SELECT * FROM categorias";
 $categorias = mysqli_query($con, $consulta_cat);
+
+include_once("../../components/header.php");
 ?>
 
 <main>
@@ -60,6 +62,10 @@ $categorias = mysqli_query($con, $consulta_cat);
 
                     if ($error_msg === 'no_image') {
                         $error_msg = "Debe subir al menos una imagen (jpg, jpeg o png) ⚠️";
+                    } elseif ($error_msg === 'ultima_imagen') {
+                        $error_msg = "No podés borrar la última imagen: el producto tiene que tener al menos una foto ⚠️";
+                    } elseif ($error_msg === 'datos') {
+                        $error_msg = "Revisá los datos: el nombre es obligatorio, el precio tiene que ser mayor a 0 y el stock no puede ser negativo ⚠️";
                     } elseif ($error_msg === 'no_file') {
                         $error_msg = "Debe subir al menos un archivo válido ⚠️";
                     }
@@ -83,7 +89,7 @@ $categorias = mysqli_query($con, $consulta_cat);
                         <div class="col-12">
                             <label class="form-label primero">Nombre del Producto</label>
                             <input type="text" class="form-control" name="nombre"
-                                value="<?php print $producto['nombre']; ?>" required>
+                                value="<?php print htmlspecialchars($producto['nombre']); ?>" required>
                         </div>
                     </div>
 
@@ -97,7 +103,7 @@ $categorias = mysqli_query($con, $consulta_cat);
                                     $sel = ($c['id_categoria'] == $producto['fk_categoria']) ? "selected" : "";
                                 ?>
                                     <option value="<?php print $c['id_categoria']; ?>" <?php print $sel; ?>>
-                                        <?php print $c['categoria']; ?>
+                                        <?php print htmlspecialchars($c['categoria']); ?>
                                     </option>
                                 <?php endwhile; ?>
                             </select>
@@ -107,7 +113,7 @@ $categorias = mysqli_query($con, $consulta_cat);
                     <div class="row mt-3">
                         <div class="col-12">
                             <label class="form-label">Descripción</label>
-                            <textarea name="descripcion" class="form-control" rows="3"><?php print $producto['descripcion']; ?></textarea>
+                            <textarea name="descripcion" class="form-control" rows="3"><?php print htmlspecialchars($producto['descripcion']); ?></textarea>
                         </div>
                     </div>
 
@@ -147,9 +153,12 @@ $categorias = mysqli_query($con, $consulta_cat);
                                     }
                                     ?>
 
-                                    <a href="eliminar_archivo.php?id=<?php print $a['id_archivo']; ?>&prod=<?php print $id_producto; ?>"
+                                    <!-- el boton manda el formulario por POST a eliminar_archivo.php (formaction) -->
+                                    <button type="submit" formaction="eliminar_archivo.php" formnovalidate
+                                        name="id_archivo" value="<?php print intval($a['id_archivo']); ?>"
                                         onclick="return confirm('¿Seguro que deseas eliminar este archivo?')"
                                         style="
+                                        border:none;
                                         position:absolute;
                                         top:0; right:0;
                                         background:red; 
@@ -159,7 +168,7 @@ $categorias = mysqli_query($con, $consulta_cat);
                                         text-align:center;
                                         line-height:22px;
                                         text-decoration:none;
-                                   ">X</a>
+                                   ">X</button>
 
                                 </div>
                             <?php endwhile; ?>

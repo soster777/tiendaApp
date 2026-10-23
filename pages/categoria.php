@@ -8,14 +8,14 @@ include_once("../components/config/config.php");
     <div class="container">
         <?php
         if (isset($_GET['id'])) {
-            $id = mysqli_real_escape_string($con, $_GET['id']);
+            $id = intval($_GET['id']);
 
             // Obtenemos el nombre de la categoría para el título y el bloque
             $consulta = "SELECT categoria FROM categorias WHERE id_categoria='$id'";
             $respuesta = mysqli_query($con, $consulta);
 
             if ($fila = mysqli_fetch_assoc($respuesta)) {
-                $nombre_cat = $fila['categoria'];
+                $nombre_cat = htmlspecialchars($fila['categoria']);
                 ?>
                 <div class="row">
                     <div class="col-12">
@@ -58,14 +58,17 @@ include_once("../components/config/config.php");
                                 $resp_img = mysqli_query($con, $consulta_img);
                                 $img = mysqli_fetch_assoc($resp_img);
                                 $imagen = $img ? $img["nombre"] : "no-image.png";
+                                // el nombre se escapa al mostrarlo y el precio se ve con formato ($189.999,00)
+                                $nombre_html = htmlspecialchars($prod['nombre'], ENT_QUOTES);
+                                $precio_txt = number_format($prod['precio'], 2, ',', '.');
 
                                 echo "
                                 <article class='col-xl-3 col-lg-4 col-md-6 col-12 d-flex justify-content-center'>
                                     <div class='card mb-4 w-100 shadow-sm'>
-                                        <img src='../prod_img/$imagen' class='card-img-top' alt='{$prod['nombre']}' style='height: 200px; object-fit: cover;'>
+                                        <img src='../prod_img/$imagen' class='card-img-top' alt='$nombre_html' style='height: 200px; object-fit: cover;'>
                                         <div class='card-body text-center'>
-                                            <h5 class='card-title'>{$prod['nombre']}</h5>
-                                            <p class='card-text font-weight-bold'>\${$prod['precio']}</p>
+                                            <h5 class='card-title'>$nombre_html</h5>
+                                            <p class='card-text font-weight-bold'>\$$precio_txt</p>
                                             <button type='button' class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#modalProd$producto_id'>
                                                 Ver producto
                                             </button>
@@ -112,7 +115,7 @@ include_once("../components/config/config.php");
                                                     </div>
 
                                                     <div class="col-md-6">
-                                                        <h4 class="text-success">$<?php echo $prod['precio']; ?></h4>
+                                                        <h4 class="text-success">$<?php echo $precio_txt; ?></h4>
                                                         <p><strong>Descripción:</strong><br><?php echo htmlspecialchars($prod['descripcion']); ?></p>
                                                         <p><small>Stock: <?php echo $prod['stock']; ?></small></p>
                                                         <hr>
@@ -144,7 +147,12 @@ include_once("../components/config/config.php");
                     </div>
                 </section>
                 <?php
+            } else {
+                // antes, con un id que no existe la pagina quedaba vacia
+                print "<div class='alert alert-warning mt-4'>La categoría que buscás no existe. <a href='inicio.php'>Volver al inicio</a></div>";
             }
+        } else {
+            print "<div class='alert alert-warning mt-4'>No se indicó ninguna categoría. <a href='inicio.php'>Volver al inicio</a></div>";
         }
         ?>
     </div>

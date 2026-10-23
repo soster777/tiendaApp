@@ -1,16 +1,18 @@
 <?php
-session_start();
-
-if(!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'admin'){
-    header("Location: ../../index.php");
-    exit();
-}
-
 include_once("../../components/config/config.php");
+include_once("../../components/permisos.php");
 
-if(isset($_GET['id']) && isset($_GET['cat']) && trim($_GET['cat']) !== ''){
-    $id = intval($_GET['id']);
-    $nombre = htmlspecialchars(trim($_GET['cat']));
+requiere_admin();
+
+if (isset($_POST['id']) && isset($_POST['cat']) && trim($_POST['cat']) !== '') {
+    $id = intval($_POST['id']);
+    $nombre = trim($_POST['cat']);
+
+    // la categoria 1 (General) no se toca
+    if ($id <= 1) {
+        header("Location: ../categoria.php?error=protegida");
+        exit;
+    }
 
     $stmt = mysqli_prepare($con, "UPDATE `categorias` SET `categoria` = ? WHERE `id_categoria` = ?");
     mysqli_stmt_bind_param($stmt, "si", $nombre, $id);

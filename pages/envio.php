@@ -1,42 +1,31 @@
 <?php
-include_once("../components/header.php");
 include_once("../components/config/config.php");
+include_once("../components/permisos.php");
 
-if (!isset($_SESSION['id_usuario'])) {
-    print "<div class='alert alert-warning'>Debes iniciar sesión para continuar.</div>";
-    include_once("../components/footer.php");
-    exit;
-}
+// chequeos antes del header para poder redirigir
+$id_usuario = requiere_login("login.php");
 
 if (!isset($_GET['id_transaccion'])) {
-    print "<div class='alert alert-warning'>Transacción no especificada.</div>";
-    include_once("../components/footer.php");
+    header("Location: compras.php");
     exit;
 }
 
 $id_transaccion = intval($_GET['id_transaccion']);
-$id_usuario     = intval($_SESSION['id_usuario']);
+$trans = transaccion_del_usuario($con, $id_transaccion, $id_usuario);
 
-$consulta_trans = "SELECT * FROM transacciones WHERE id_transaccion = $id_transaccion";
-$res_trans = mysqli_query($con, $consulta_trans);
-
-if (!$res_trans || mysqli_num_rows($res_trans) == 0) {
-    print "<div class='alert alert-danger'>Transacción no encontrada.</div>";
-    include_once("../components/footer.php");
+// tiene que ser del usuario y seguir pendiente (si ya se eligio el envio, no se vuelve a elegir)
+if (!$trans || intval($trans['fk_estado_transaccion']) !== 1) {
+    header("Location: compras.php?envio=no");
     exit;
 }
 
-$trans = mysqli_fetch_assoc($res_trans);
+include_once("../components/header.php");
 
-$consulta_mpu = "SELECT fk_usuario FROM metodos_pagos_usuarios WHERE id_metodo_pago_usuario = {$trans['fk_metodo_pago_usuario']}";
-$res_mpu = mysqli_query($con, $consulta_mpu);
-$mpu = mysqli_fetch_assoc($res_mpu);
-
-if (!$mpu || $mpu['fk_usuario'] != $id_usuario) {
-    print "<div class='alert alert-danger'>No tenés permiso para operar esta transacción.</div>";
-    include_once("../components/footer.php");
-    exit;
-}
+$stmt = mysqli_prepare($con, "SELECT ubicacion FROM usuarios WHERE id_usuario = ?");
+mysqli_stmt_bind_param($stmt, "i", $id_usuario);
+mysqli_stmt_execute($stmt);
+$datos_usuario = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+$ubicacion = trim((string) $datos_usuario['ubicacion']);
 
 $id_producto = intval($trans['fk_producto']);
 $consulta_prod = "SELECT * FROM productos WHERE id_producto = $id_producto";
@@ -101,7 +90,8 @@ $imagen = $img ? $img["nombre"] : "no-image.png";
                                 </div>
                                 <div class="col-7">
                                     <div class="card-body">
-                                        <h5 class="card-title">$<?= $producto['precio']; ?></h5>
+                                        <h5 class="card-title">$<?= number_format($trans['total'], 2, ',', '.'); ?></h5>
+                                        <p class="card-text"><strong><?= htmlspecialchars($producto['nombre']); ?></strong> x <?= intval($trans['cantidad']); ?></p>
                                         <p class="card-text"><?= htmlspecialchars($producto['descripcion']); ?></p>
                                     </div>
                                 </div>
@@ -109,6 +99,14 @@ $imagen = $img ? $img["nombre"] : "no-image.png";
                         </div>
                     </div>
 
+                    <?php
+                    if (isset($_GET['error']) && $_GET['error'] === 'ubicacion') {
+                        print "<div class='col-12'><div class='alert alert-warning'>Para el envío a domicilio primero cargá tu ubicación en <a href='perfil.php'>Mi perfil</a>.</div></div>";
+                    }
+                    if (isset($_GET['error']) && $_GET['error'] === 'stock') {
+                        print "<div class='col-12'><div class='alert alert-danger'>Mientras comprabas se agotó el stock de este producto. Probá con una cantidad menor.</div></div>";
+                    }
+                    ?>
                     <div class="col-12 col-lg-6 mb-3">
                         <div class="card shadow-sm rounded-3 p-3 compra-card">
                             <form action="abm_envio/procesar_envio.php" method="post" class="formulario-usuario">
@@ -119,7 +117,11 @@ $imagen = $img ? $img["nombre"] : "no-image.png";
                                     <select class="form-select" id="metodo_envio" name="metodo_envio" required>
                                         <option value="">-- Elegir --</option>
                                         <option value="1">Retirar en el domicilio del vendedor</option>
-                                        <option value="2">Envío a mi domicilio registrado</option>
+                                        <?php if ($ubicacion !== ''): ?>
+                                            <option value="2">Envío a mi domicilio registrado (<?= htmlspecialchars($ubicacion); ?>)</option>
+                                        <?php else: ?>
+                                            <option value="2" disabled>Envío a domicilio (cargá tu ubicación en tu perfil)</option>
+                                        <?php endif; ?>
                                     </select>
                                 </div>
 

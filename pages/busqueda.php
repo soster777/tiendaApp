@@ -2,15 +2,19 @@
 include_once("../components/header.php");
 include_once("../components/config/config.php");
 
-$buscar = isset($_GET['buscar']) ? mysqli_real_escape_string($con, $_GET['buscar']) : "";
+// guardo lo que escribio tal cual: se usa en una consulta preparada y se escapa al mostrarlo
+// (con mysqli_real_escape_string, buscar O'Brien mostraba O\'Brien)
+$buscar = isset($_GET['buscar']) ? trim($_GET['buscar']) : "";
 
 if ($buscar != "") {
-    $consulta_prod = "SELECT * FROM productos WHERE nombre LIKE '%$buscar%'";
+    $patron = "%" . $buscar . "%";
+    $stmt = mysqli_prepare($con, "SELECT * FROM productos WHERE nombre LIKE ?");
+    mysqli_stmt_bind_param($stmt, "s", $patron);
+    mysqli_stmt_execute($stmt);
+    $respuesta_prod = mysqli_stmt_get_result($stmt);
 } else {
-    $consulta_prod = "SELECT * FROM productos";
+    $respuesta_prod = mysqli_query($con, "SELECT * FROM productos");
 }
-
-$respuesta_prod = mysqli_query($con, $consulta_prod);
 
 $consulta_tipos = "SELECT id_tipo_archivo FROM tipos_archivos WHERE tipo IN ('JPG','JPEG','PNG')";
 $resp_tipos = mysqli_query($con, $consulta_tipos);
@@ -56,14 +60,17 @@ $tipos_lista = implode(",", $tipos_img);
                         $resp_img = mysqli_query($con, $consulta_img);
                         $img = mysqli_fetch_assoc($resp_img);
                         $imagen = $img ? $img["nombre"] : "no-image.png";
+                                // el nombre se escapa al mostrarlo y el precio se ve con formato ($189.999,00)
+                                $nombre_html = htmlspecialchars($prod['nombre'], ENT_QUOTES);
+                                $precio_txt = number_format($prod['precio'], 2, ',', '.');
 
                         echo "
                         <article class='col-xl-3 col-lg-4 col-md-6 col-12'>
                             <div class='card mb-4 w-100 shadow-sm'>
-                                <img src='../prod_img/$imagen' class='card-img-top' alt='{$prod['nombre']}' style='height: 200px; object-fit: cover;'>
+                                <img src='../prod_img/$imagen' class='card-img-top' alt='$nombre_html' style='height: 200px; object-fit: cover;'>
                                 <div class='card-body text-center'>
-                                    <h5 class='card-title'>{$prod['nombre']}</h5>
-                                    <p class='card-text font-weight-bold'>\${$prod['precio']}</p>
+                                    <h5 class='card-title'>$nombre_html</h5>
+                                    <p class='card-text font-weight-bold'>\$$precio_txt</p>
                                     <button type='button' class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#modalProd$producto_id'>
                                         Ver producto
                                     </button>
@@ -110,7 +117,7 @@ $tipos_lista = implode(",", $tipos_img);
                                             </div>
 
                                             <div class="col-md-6">
-                                                <h4 class="text-success">$<?php echo $prod['precio']; ?></h4>
+                                                <h4 class="text-success">$<?php echo $precio_txt; ?></h4>
                                                 <p><strong>Descripción:</strong><br><?php echo htmlspecialchars($prod['descripcion']); ?></p>
                                                 <p><small>Stock: <?php echo $prod['stock']; ?></small></p>
                                                 <hr>

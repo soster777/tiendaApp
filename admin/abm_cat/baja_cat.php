@@ -1,27 +1,26 @@
 <?php
-session_start();
-
-if(!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'admin'){
-    header("Location: ../../index.php");
-    exit();
-}
-
 include_once("../../components/config/config.php");
+include_once("../../components/permisos.php");
 
-// la categoria 1 es la generica, no se puede borrar porque ahi paso los productos
-if(isset($_GET['id']) && intval($_GET['id']) > 1){
-    $baja = intval($_GET['id']);
+requiere_admin();
 
-    $update = "UPDATE productos SET fk_categoria = 1 WHERE fk_categoria = $baja";
-    mysqli_query($con, $update);
+// por POST desde el boton Eliminar. La categoria 1 es la generica, no se puede borrar
+// porque ahi paso los productos de la categoria que se borra
+if (isset($_POST['id']) && intval($_POST['id']) > 1) {
+    $baja = intval($_POST['id']);
 
-    $consulta = "DELETE FROM categorias WHERE id_categoria = $baja";
-    mysqli_query($con, $consulta);
+    $stmt = mysqli_prepare($con, "UPDATE productos SET fk_categoria = 1 WHERE fk_categoria = ?");
+    mysqli_stmt_bind_param($stmt, "i", $baja);
+    mysqli_stmt_execute($stmt);
+
+    $stmt = mysqli_prepare($con, "DELETE FROM categorias WHERE id_categoria = ?");
+    mysqli_stmt_bind_param($stmt, "i", $baja);
+    mysqli_stmt_execute($stmt);
 
     header("Location: ../categoria.php?baja=ok");
     exit();
 }
 
-header("Location: ../categoria.php");
+header("Location: ../categoria.php?error=protegida");
 exit();
 ?>

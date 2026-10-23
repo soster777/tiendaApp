@@ -1,76 +1,69 @@
 <?php
-session_start();
 include_once("../../components/config/config.php");
+include_once("../../components/permisos.php");
 
-if (!isset($_SESSION['id_usuario'])) {
-    print "<div class='alert alert-warning'>Debes iniciar sesión para continuar.</div>";
-    exit;
-}
+$id_usuario = requiere_login("../login.php");
 
 if (!isset($_POST['id_transaccion'], $_POST['metodo_envio'])) {
-    print "<div class='alert alert-danger'>Faltan datos obligatorios.</div>";
+    header("Location: ../compras.php");
     exit;
 }
 
 $id_transaccion = intval($_POST['id_transaccion']);
 $metodo_envio   = intval($_POST['metodo_envio']);
 
-$check_trans = "
-    SELECT * 
-    FROM transacciones 
-    WHERE id_transaccion = $id_transaccion
-    LIMIT 1
-";
-$res_trans = mysqli_query($con, $check_trans);
+$trans = transaccion_del_usuario($con, $id_transaccion, $id_usuario);
 
-if (!$res_trans || mysqli_num_rows($res_trans) == 0) {
-    print "<div class='alert alert-danger'>Transacción no válida.</div>";
+// la compra tiene que ser del usuario y seguir pendiente
+// asi si se reenvia el formulario no se descuenta el stock dos veces ni se crea otro envio
+if (!$trans || intval($trans['fk_estado_transaccion']) !== 1) {
+    header("Location: ../compras.php?envio=no");
     exit;
 }
 
-$trans = mysqli_fetch_assoc($res_trans);
+// envio a domicilio: el usuario tiene que tener una ubicacion cargada
+if ($metodo_envio != 1) {
+    $stmt = mysqli_prepare($con, "SELECT ubicacion FROM usuarios WHERE id_usuario = ?");
+    mysqli_stmt_bind_param($stmt, "i", $id_usuario);
+    mysqli_stmt_execute($stmt);
+    $usuario = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+    if (!$usuario || trim((string) $usuario['ubicacion']) === '') {
+        header("Location: ../envio.php?id_transaccion=$id_transaccion&error=ubicacion");
+        exit;
+    }
+}
 
-$update_trans = "
-    UPDATE transacciones
-    SET fk_estado_transaccion = 2
-    WHERE id_transaccion = $id_transaccion
-";
-mysqli_query($con, $update_trans);
+$id_producto = intval($trans['fk_producto']);
+$cantidad_comprada = intval($trans['cantidad']);
 
-$id_producto = $trans['fk_producto'];
-$cantidad_comprada = $trans['cantidad'];
+// descuento el stock solo si alcanza. Lo hago en una sola consulta para que si dos personas
+// compran la ultima unidad al mismo tiempo, solo una lo logre (antes con max(0, ...) se vendia de mas)
+$stmt = mysqli_prepare($con, "UPDATE productos SET stock = stock - ? WHERE id_producto = ? AND stock >= ?");
+mysqli_stmt_bind_param($stmt, "iii", $cantidad_comprada, $id_producto, $cantidad_comprada);
+mysqli_stmt_execute($stmt);
 
-$res_stock = mysqli_query($con, "SELECT stock FROM productos WHERE id_producto = $id_producto");
-$stock_actual = intval(mysqli_fetch_assoc($res_stock)['stock']);
+if (mysqli_affected_rows($con) == 0) {
+    header("Location: ../envio.php?id_transaccion=$id_transaccion&error=stock");
+    exit;
+}
 
-$nuevo_stock = max(0, $stock_actual - $cantidad_comprada);
-$fk_estado_producto = ($nuevo_stock == 0) ? 2 : 1;
+// si quedo en 0 lo marco como agotado
+$stmt = mysqli_prepare($con, "UPDATE productos SET fk_estado_producto = 2 WHERE id_producto = ? AND stock = 0");
+mysqli_stmt_bind_param($stmt, "i", $id_producto);
+mysqli_stmt_execute($stmt);
 
-$update_stock = "
-    UPDATE productos
-    SET stock = $nuevo_stock,
-        fk_estado_producto = $fk_estado_producto
-    WHERE id_producto = $id_producto
-";
-mysqli_query($con, $update_stock);
+$stmt = mysqli_prepare($con, "UPDATE transacciones SET fk_estado_transaccion = 2 WHERE id_transaccion = ?");
+mysqli_stmt_bind_param($stmt, "i", $id_transaccion);
+mysqli_stmt_execute($stmt);
 
+// 1 = retiro en el local (queda "A retirar"), 2 = envio a domicilio (queda "En camino")
 if ($metodo_envio == 1) {
-    $estado_envio = 1;
-    $fecha_envio = "NULL";
+    $stmt = mysqli_prepare($con, "INSERT INTO envios (fecha_envio, fecha_entrega, fk_estado_envio, fk_transaccion) VALUES (NULL, NULL, 1, ?)");
 } else {
-    $estado_envio = 2;
-    $fecha_envio = "NOW()";
+    $stmt = mysqli_prepare($con, "INSERT INTO envios (fecha_envio, fecha_entrega, fk_estado_envio, fk_transaccion) VALUES (NOW(), NULL, 2, ?)");
 }
-
-$insert_envio = "
-    INSERT INTO envios (fecha_envio, fecha_entrega, fk_estado_envio, fk_transaccion)
-    VALUES ($fecha_envio, NULL, $estado_envio, $id_transaccion)
-";
-
-if (!mysqli_query($con, $insert_envio)) {
-    print "<div class='alert alert-danger'>Error al registrar el envío: " . mysqli_error($con) . "</div>";
-    exit;
-}
+mysqli_stmt_bind_param($stmt, "i", $id_transaccion);
+mysqli_stmt_execute($stmt);
 
 header("Location: ../inicio.php?envio=ok");
 exit;

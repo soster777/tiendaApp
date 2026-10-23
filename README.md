@@ -1,6 +1,6 @@
 # TiendApp 🛒
 
-Tienda online hecha en **PHP y MySQL** para la materia Programación Web en la Escuela Da Vinci.
+Tienda online hecha en **PHP y MySQL** para la materia Programación Web II en la Escuela Da Vinci.
 
 Los usuarios se registran, publican sus productos y compran productos de otros usuarios. Hay además un panel de administrador para gestionar las categorías.
 
@@ -11,13 +11,14 @@ Los usuarios se registran, publican sus productos y compran productos de otros u
 - Perfil editable (nombre, mail, ubicación y contraseña)
 - Publicar, editar y eliminar productos propios, con varias imágenes o videos por producto
 - Buscador y filtro por categorías
-- Compra de productos con método de pago (tarjeta o CBU) y cuotas
+- Compra de productos con método de pago (tarjeta o CBU) y cuotas, con control de stock
 - Seguimiento del envío y confirmación de recepción
 - Historial de compras
 - Formulario de sugerencias con imagen adjunta
 
 **Administrador**
 - ABM de categorías
+- Revisión de las sugerencias de los usuarios (pendiente, aprobada o rechazada)
 - Gestión del perfil
 
 ## Tecnologías
@@ -30,16 +31,23 @@ Los usuarios se registran, publican sus productos y compran productos de otros u
 
 ## Base de datos
 
-La base `tiendapp` tiene 17 tablas relacionadas: usuarios, roles, productos, categorías, archivos, transacciones, envíos, métodos de pago, sugerencias y comentarios, y las tablas de estados de cada uno.
+La base `tiendapp` tiene 17 tablas: usuarios, roles, productos, categorías, archivos, transacciones, envíos, métodos de pago, sugerencias y comentarios, y las tablas de estados de cada uno.
 
 El script completo está en [`database/tiendapp.sql`](database/tiendapp.sql).
 
-## Seguridad
+## Seguridad y validaciones
 
-- Consultas preparadas (`mysqli_prepare`) en login, registro, perfil, categorías y productos, para evitar inyección SQL
-- Validación de datos de formularios con `trim`, `htmlspecialchars` y `filter_var` (prevención de XSS)
-- Control de sesión y de roles: solo el admin entra al panel, y cada usuario solo puede editar o borrar sus propios productos
-- Validación del tipo de archivo y limpieza del nombre con expresiones regulares en las subidas
+- **Consultas preparadas** (`mysqli_prepare`) en todo lo que recibe texto del usuario, y los números se convierten con `intval`, para evitar inyección SQL.
+- **Prevención de XSS:** los datos se guardan tal cual y se escapan con `htmlspecialchars` al mostrarlos.
+- **Formularios:** se validan con `trim`, `filter_var` (mail) y expresiones regulares (tarjeta, CBU, nombres de archivo).
+- **Sesiones y roles:** solo el admin entra al panel, y cada usuario solo puede ver, editar o cancelar sus propios productos, compras y envíos. Los permisos se chequean antes de imprimir la página, así las redirecciones funcionan en cualquier servidor.
+- **Cambios por POST:** las acciones que borran, cancelan o cambian estados se hacen desde formularios y no desde links.
+- **Compras:**
+  - la cantidad tiene que ser al menos 1;
+  - no se puede comprar un producto propio;
+  - el stock se descuenta una sola vez y solo si alcanza, así no se vende de más;
+  - al cancelar un envío, el stock se devuelve una sola vez.
+- **Tarjetas:** se guardan solo los últimos 4 números, y nunca el código de seguridad.
 
 ## Cómo correrlo
 
@@ -55,6 +63,7 @@ El script completo está en [`database/tiendapp.sql`](database/tiendapp.sql).
 | --- | --- | --- |
 | Administrador | admin@gmail.com | 1234 |
 | Usuario | laura@gmail.com | 1234 |
+| Usuario | martin@gmail.com | 1234 |
 
 > Los datos de tarjeta son de prueba. Es un proyecto académico y no procesa pagos reales.
 
@@ -62,7 +71,7 @@ El script completo está en [`database/tiendapp.sql`](database/tiendapp.sql).
 
 ```
 tiendApp/
-├── admin/        panel del administrador (categorías y perfil)
+├── admin/        panel del administrador (categorías, sugerencias y perfil)
 ├── components/   header, footer, conexión y permisos
 ├── database/     script SQL de la base
 ├── editor/       publicar y editar productos

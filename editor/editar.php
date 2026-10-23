@@ -1,9 +1,11 @@
 <?php
-include_once("../components/header.php");
 include_once("../components/config/config.php");
 include_once("../components/permisos.php");
 
+// el chequeo va antes del header para que la redireccion funcione
 $usuario = requiere_login("../pages/login.php");
+
+include_once("../components/header.php");
 ?>
 
 <br> <main class="container">
@@ -20,6 +22,9 @@ $usuario = requiere_login("../pages/login.php");
     }
     ?>
     <?php
+    if (isset($_GET['baja']) && $_GET['baja'] === "no") {
+        print "<div class='alert alert-warning'>No podés eliminar ese producto porque tiene una compra o un envío en curso.</div>";
+    }
     if (isset($_GET['modificacion']) && $_GET['modificacion'] === "ok") {
         print "<div class='alert alert-success' role='alert'>
         Producto modificado correctamente 💾
@@ -69,14 +74,17 @@ $usuario = requiere_login("../pages/login.php");
                     print "
                     <tr>
                         <td class='primera_col'>{$fila['id_producto']}</td>
-                        <td>{$fila['nombre']}</td>
-                        <td>$categoria</td>
-                        <td>{$fila['precio']}</td>
+                        <td>" . htmlspecialchars($fila['nombre']) . "</td>
+                        <td>" . htmlspecialchars($categoria) . "</td>
+                        <td>$" . number_format($fila['precio'], 2, ',', '.') . "</td>
                         <td>{$fila['stock']}</td>
                         <td>$estado</td>
                         <td>
                             <a href='abm_prod/modificacion_prod.php?id={$fila['id_producto']}' class='btn btn-warning btn-sm'>Modificar</a>
-                            <a href='abm_prod/baja_prod.php?id={$fila['id_producto']}' class='btn btn-danger btn-sm' onclick=\"return confirm('¿Estás seguro de que deseas eliminar este producto? Esta acción eliminará también todas sus imágenes?')\">Eliminar</a>
+                            <form action='abm_prod/baja_prod.php' method='post' class='d-inline' onsubmit=\"return confirm('¿Estás seguro de que deseas eliminar este producto? Esta acción eliminará también todas sus imágenes.')\">
+                                <input type='hidden' name='id' value='{$fila['id_producto']}'>
+                                <button type='submit' class='btn btn-danger btn-sm'>Eliminar</button>
+                            </form>
                         </td>
                     </tr>
                     ";

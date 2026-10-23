@@ -1,5 +1,7 @@
 <?php
-session_start();
+if (!isset($_SESSION)) {
+    session_start();
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -79,7 +81,7 @@ session_start();
                 <li><hr class='dropdown-divider'></li>
                 <li><a class='dropdown-item montserrat-bold' href='/tiendApp/pages/compras.php'>Mis compras</a></li>
                 <li><hr class='dropdown-divider'></li>
-                <li><a class='dropdown-item text-danger montserrat-bold' href='../log/cerrar.php'>Cerrar sesión</a></li>
+                <li><a class='dropdown-item text-danger montserrat-bold' href='/tiendApp/log/cerrar.php'>Cerrar sesión</a></li>
               </ul>
             </li>
             ";

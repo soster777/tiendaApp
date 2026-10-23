@@ -1,21 +1,18 @@
 <?php  
-include_once("../components/header.php");
 include_once("../components/config/config.php");
+include_once("../components/permisos.php");
 
-if (!isset($_SESSION['id_usuario'])) {
-    print "<div class='alert alert-warning'>Debes iniciar sesión para comprar.</div>";
-    include_once("../components/footer.php");
-    exit;
-}
+// los chequeos van antes del header, asi la redireccion funciona
+$id_usuario = requiere_login("login.php");
 
 if (!isset($_GET['id_producto'])) {
-    print "<div class='alert alert-warning'>Producto no especificado.</div>";
-    include_once("../components/footer.php");
+    header("Location: inicio.php");
     exit;
 }
 
 $id_producto = intval($_GET['id_producto']);
-$id_usuario = intval($_SESSION['id_usuario']);
+
+include_once("../components/header.php");
 
 $check_trans = "
     SELECT t.* 
@@ -76,7 +73,7 @@ $res_metodos_usuario = mysqli_query($con, "SELECT * FROM metodos_pagos_usuarios 
                                 </div>
                                 <div class="col-7">
                                     <div class="card-body">
-                                        <h5 class="card-title">$<?= $producto['precio']; ?></h5>
+                                        <h5 class="card-title">$<?= number_format($producto['precio'], 2, ',', '.'); ?></h5>
                                         <p class="card-text"><?= htmlspecialchars($producto['descripcion']); ?></p>
                                         <p class="card-text"><strong>Stock disponible:</strong> <?= $producto['stock']; ?></p>
                                     </div>
@@ -85,12 +82,30 @@ $res_metodos_usuario = mysqli_query($con, "SELECT * FROM metodos_pagos_usuarios 
                         </div>
                     </div>
 
+                    <?php
+                    // mensajes que vienen de transaccion_ok.php
+                    $errores = [
+                        "cantidad" => "La cantidad tiene que ser al menos 1.",
+                        "stock" => "No hay suficiente stock disponible.",
+                        "cuotas" => "Cantidad de cuotas inválida.",
+                        "metodo" => "Elegí un método de pago válido.",
+                        "propio" => "No podés comprar tu propio producto."
+                    ];
+                    if (isset($_GET['error']) && isset($errores[$_GET['error']])) {
+                        print "<div class='col-12'><div class='alert alert-danger'>" . $errores[$_GET['error']] . "</div></div>";
+                    }
+                    if ($id_usuario == $producto['fk_usuario']) {
+                        print "<div class='col-12 col-lg-6'><div class='alert alert-info'>Este producto es tuyo, no lo podés comprar.</div></div>";
+                    } elseif ($producto['stock'] <= 0) {
+                        print "<div class='col-12 col-lg-6'><div class='alert alert-warning'>Este producto está agotado.</div></div>";
+                    }
+                    ?>
+
                     <?php if ($id_usuario != $producto['fk_usuario'] && $producto['stock'] > 0): ?>
                         <div class="col-12 col-lg-6 mb-3">
                             <div class="card shadow-sm rounded-3 p-3 compra-card">
                                 <form action="abm_transacciones/transaccion_ok.php" method="post" class="formulario-usuario">
                                     <input type="hidden" name="id_producto" value="<?= $producto['id_producto']; ?>">
-                                    <input type="hidden" name="id_transaccion" value="<?= $trans_pendiente['id_transaccion'] ?? ''; ?>">
 
                                     <div class="mb-3">
                                         <label for="cantidad" class="form-label primero">Cantidad</label>
@@ -116,7 +131,9 @@ $res_metodos_usuario = mysqli_query($con, "SELECT * FROM metodos_pagos_usuarios 
 
                                                     $selected = ($trans_pendiente['fk_metodo_pago_usuario'] ?? 0) == $id_guardado ? "selected" : "";
 
-                                                    print "<option value='$id_guardado' data-metodo='$fk_metodo' $selected>$nombre_metodo</option>";
+                                                    // muestro el nombre que le puso el usuario y los ultimos 4 numeros si es tarjeta
+                                                    $detalle = $mpu['numero_tarjeta'] ? " terminada en " . htmlspecialchars(substr($mpu['numero_tarjeta'], -4)) : "";
+                                                    print "<option value='$id_guardado' data-metodo='$fk_metodo' $selected>" . htmlspecialchars($mpu['nombre']) . " - $nombre_metodo$detalle</option>";
                                                 }
                                             } else {
                                                 print "<option value=''>No tenés métodos guardados. Agregá uno primero.</option>";
@@ -137,12 +154,17 @@ $res_metodos_usuario = mysqli_query($con, "SELECT * FROM metodos_pagos_usuarios 
                                     <div class="d-flex gap-2">
                                         <button type="submit" class="btn flex-fill">Continuar</button>
                                         <?php if ($trans_pendiente): ?>
-                                            <a href="abm_transacciones/cancelar_transaccion.php?id=<?= $trans_pendiente['id_transaccion']; ?>" 
-                                               class="btn btn-danger flex-fill">Cancelar compra</a>
+                                            <!-- el boton manda el formulario de abajo (por POST) -->
+                                            <button type="submit" form="form-cancelar" class="btn btn-danger flex-fill">Cancelar compra</button>
                                         <?php endif; ?>
                                     </div>
 
                                 </form>
+                                <?php if ($trans_pendiente): ?>
+                                    <form id="form-cancelar" action="abm_transacciones/cancelar_transaccion.php" method="post">
+                                        <input type="hidden" name="id" value="<?= intval($trans_pendiente['id_transaccion']); ?>">
+                                    </form>
+                                <?php endif; ?>
                             </div>
                         </div>
                     <?php endif; ?>
@@ -153,7 +175,10 @@ $res_metodos_usuario = mysqli_query($con, "SELECT * FROM metodos_pagos_usuarios 
 </main>
 
 <script>
-document.getElementById("metodo_pago").addEventListener("change", function () {
+// el select solo existe si se muestra el formulario (no aparece si el producto es propio o esta agotado)
+const selectMetodo = document.getElementById("metodo_pago");
+if (selectMetodo) {
+selectMetodo.addEventListener("change", function () {
     const selected = this.options[this.selectedIndex];
     const metodoReal = selected.getAttribute("data-metodo");
 
@@ -167,6 +192,9 @@ document.getElementById("metodo_pago").addEventListener("change", function () {
         contenedor.style.display = "none";
     }
 });
+// si vuelve a una compra pendiente con tarjeta, muestro las cuotas de entrada
+selectMetodo.dispatchEvent(new Event("change"));
+}
 </script>
 
 <?php include_once("../components/footer.php"); ?>

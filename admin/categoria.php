@@ -1,15 +1,13 @@
 <?php
+include_once("../components/config/config.php");
+include_once("../components/permisos.php");
+
+requiere_admin();
+
 include_once("../components/header_admin.php");
 ?>
 <main>
   <div class="container-fluid">
-    <?php
-    include_once("../components/config/config.php");
-    if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'admin') {
-      header("Location: ../index.php");
-      exit();
-    }
-    ?>
 
     <h1 class="montserrat-bold">ABM - Categorías</h1>
 
@@ -37,7 +35,7 @@ include_once("../components/header_admin.php");
     <div class="row">
       <section class="col-12 col-lg-6">
         <h2 class="montserrat-bold">Agregar nueva categoría</h2>
-        <form action="abm_cat/alta_cat.php" method="get" class="formulario-usuario">
+        <form action="abm_cat/alta_cat.php" method="post" class="formulario-usuario">
           <div class="row mb-2">
             <div class="col-md-8">
               <label for="cat" class="form-label primero">Nueva Categoría</label>
@@ -80,11 +78,11 @@ include_once("../components/header_admin.php");
                       <a href="abm_cat/mod_cat.php?id=<?= $fila['id_categoria'] ?>" class="btn btn-warning btn-sm">Modificar</a>
                     </td>
                     <td>
-                      <a href="abm_cat/baja_cat.php?id=<?= $fila['id_categoria'] ?>"
-                        class="btn btn-danger btn-sm"
-                        onclick="return confirm('¿Seguro que querés eliminar esta categoría?')">
-                        Eliminar
-                      </a>
+                      <form action="abm_cat/baja_cat.php" method="post"
+                        onsubmit="return confirm('¿Seguro que querés eliminar esta categoría?')">
+                        <input type="hidden" name="id" value="<?= intval($fila['id_categoria']) ?>">
+                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                      </form>
                     </td>
                   <?php endif; ?>
 

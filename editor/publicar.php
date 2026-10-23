@@ -1,8 +1,10 @@
 <?php
-include_once("../components/header.php");
 include_once("../components/permisos.php");
 
+// el chequeo va antes del header para que la redireccion funcione
 requiere_login("../pages/login.php");
+
+include_once("../components/header.php");
 ?>
 
 <br> <main>

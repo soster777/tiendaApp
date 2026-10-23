@@ -1,12 +1,10 @@
 <?php
-include_once("../../components/header_admin.php");
 include_once("../../components/config/config.php");
+include_once("../../components/permisos.php");
 
-if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'admin') {
-    header("Location: ../../index.php");
-    exit();
-}
+requiere_admin();
 
+include_once("../../components/header_admin.php");
 ?>
 
 <main>
@@ -16,7 +14,7 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'admin') {
             <div class="col-12 col-lg-6">
                 <h1 class="montserrat-bold">Modificar Categoría</h1>
 
-                <form action="mod_cat_ok.php" method="get" class="formulario-usuario">
+                <form action="mod_cat_ok.php" method="post" class="formulario-usuario">
                     <div class="row mb-2">
                         <div class="col-12">
                             <label for="cat" class="form-label primero">Modificar Categoría</label>

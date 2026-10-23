@@ -3,11 +3,13 @@ include_once("../components/config/config.php");
 
 if (isset($_POST["nombre"]) and isset($_POST["mail"]) and isset($_POST["contrasena"]) and isset($_POST["contrasena_rep"]) and isset($_POST["ubicacion"])) {
 
-    $nombre = htmlspecialchars(trim($_POST["nombre"]));
+    // guardo los datos tal cual y los escapo con htmlspecialchars recien al mostrarlos
+    // (la contraseña tampoco se escapa: se usa igual aca, en el login y al cambiarla)
+    $nombre = trim($_POST["nombre"]);
     $mail = trim($_POST["mail"]);
-    $contrasena = htmlspecialchars($_POST["contrasena"]);
-    $contrasena_rep = htmlspecialchars($_POST["contrasena_rep"]);
-    $ubicacion = htmlspecialchars(trim($_POST["ubicacion"]));
+    $contrasena = $_POST["contrasena"];
+    $contrasena_rep = $_POST["contrasena_rep"];
+    $ubicacion = trim($_POST["ubicacion"]);
 
     if ($nombre == "" or $mail == "" or $contrasena == "" or $contrasena_rep == "") {
         header("Location: ../pages/registro.php?datos=faltan");

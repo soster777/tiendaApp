@@ -1,4 +1,6 @@
-<?php session_start(); ?>
+<?php if (!isset($_SESSION)) {
+    session_start();
+} ?>
 <!doctype html>
 <html lang="es">
 
@@ -17,7 +19,7 @@
     <header>
         <nav class="navbar navbar-expand-lg fixed-top" style="background-color: rgba(35, 0, 105, 1);">
             <div class="container-fluid"> 
-                <a class="navbar-brand montserrat-bold" href="index.php">
+                <a class="navbar-brand montserrat-bold" href="/tiendApp/admin/index.php">
                     <img src="/tiendApp/imgs/logo.png" alt="Logo" width="30" height="30" class="d-inline-block align-text-top"> TiendApp - ADMIN
                 </a> 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"> 
@@ -26,18 +28,21 @@
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav">
                         <li class="nav-item"> 
-                            <a class="nav-link montserrat-bold" aria-current="page" href="/tiendapp/admin/categoria.php">Ver categorías</a> 
+                            <a class="nav-link montserrat-bold" aria-current="page" href="/tiendApp/admin/categoria.php">Ver categorías</a> 
+                        </li>
+                        <li class="nav-item"> 
+                            <a class="nav-link montserrat-bold" href="/tiendApp/admin/sugerencias.php">Ver sugerencias</a> 
                         </li>
                         <li class='nav-item dropdown'> 
                             <a class='nav-link dropdown-toggle montserrat-bold' href='#' role='button' data-bs-toggle='dropdown' aria-expanded='false'> 
-                                👋 Hola, <?= htmlspecialchars($_SESSION['nombre']); ?> 
+                                👋 Hola, <?= htmlspecialchars($_SESSION['nombre'] ?? ''); ?> 
                             </a>
                             <ul class='dropdown-menu dropdown-menu-end'>
-                                <li><a class='dropdown-item montserrat-bold' href='/tiendapp/admin/perfil.php'>Ver perfil</a></li>
+                                <li><a class='dropdown-item montserrat-bold' href='/tiendApp/admin/perfil.php'>Ver perfil</a></li>
                                 <li>
                                     <hr class='dropdown-divider'>
                                 </li>
-                                <li><a class='dropdown-item text-danger montserrat-bold' href='../log/cerrar.php'>Cerrar sesión</a></li>
+                                <li><a class='dropdown-item text-danger montserrat-bold' href='/tiendApp/log/cerrar.php'>Cerrar sesión</a></li>
                             </ul>
                         </li>
                     </ul>
