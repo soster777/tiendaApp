@@ -23,7 +23,8 @@ if (isset($_POST["mail"]) && isset($_POST["contrasena"])) {
         if ($fila['fk_rol'] == 1) {
             header("Location: ../admin/index.php");
         } else {
-            header("Location: ../pages/inicio.php");
+            // los usuarios comunes van a su pagina de bienvenida (solo para logueados)
+            header("Location: ../pages/bienvenida.php");
         }
         exit;
     } else {

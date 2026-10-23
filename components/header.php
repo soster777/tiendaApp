@@ -74,6 +74,7 @@ if (!isset($_SESSION)) {
                 👋 Hola, $nombre_user
               </a>
               <ul class='dropdown-menu dropdown-menu-end'>
+                <li><a class='dropdown-item montserrat-bold' href='/tiendApp/pages/bienvenida.php'>Mi cuenta</a></li>
                 <li><a class='dropdown-item montserrat-bold' href='/tiendApp/pages/perfil.php'>Ver perfil</a></li>
                 <li><hr class='dropdown-divider'></li>
                 <li><a class='dropdown-item montserrat-bold' href='/tiendApp/editor/publicar.php'>Agregar producto</a></li>
