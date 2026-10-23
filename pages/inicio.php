@@ -1,9 +1,7 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 include_once("../components/header.php");
-include_once("../components/config/config.php"); 
+include_once("../components/config/config.php");
+include_once("../components/paginacion.php");
 ?>
 
 <main>
@@ -24,7 +22,18 @@ include_once("../components/config/config.php");
         </div>
 
         <?php
-        $consulta_prod = "SELECT * FROM productos"; 
+        // paginacion: 9 productos por pagina (3 filas de 3)
+        $por_pagina = 9;
+        $total_productos = mysqli_fetch_assoc(mysqli_query($con, "SELECT COUNT(*) AS cantidad FROM productos"))['cantidad'];
+        $total_paginas = total_paginas($total_productos, $por_pagina);
+        $pagina = pagina_actual();
+        // si piden una pagina que no existe (?pagina=50) muestro la ultima
+        if ($total_paginas > 0 && $pagina > $total_paginas) {
+            $pagina = $total_paginas;
+        }
+        $desde = ($pagina - 1) * $por_pagina;
+
+        $consulta_prod = "SELECT * FROM productos LIMIT $por_pagina OFFSET $desde";
         $respuesta_prod = mysqli_query($con, $consulta_prod);
 
         $consulta_tipos = "SELECT id_tipo_archivo FROM tipos_archivos WHERE tipo IN ('JPG','JPEG','PNG')";
@@ -143,6 +152,7 @@ include_once("../components/config/config.php");
                     </div>
                 </div>
             </div>
+            <?php mostrar_paginacion($pagina, $total_paginas, "inicio.php?"); ?>
         </section>
     </div>
 </main>

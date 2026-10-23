@@ -5,7 +5,7 @@ include_once("../../components/permisos.php");
 $id_usuario = requiere_login("../../pages/login.php");
 
 if (!isset($_POST['id_producto'], $_POST['nombre'], $_POST['categoria'], $_POST['descripcion'], $_POST['stock'], $_POST['precio'])) {
-    header("Location: ../editar.php");
+    header("Location: " . lista_de_productos());
     exit();
 }
 
@@ -17,8 +17,8 @@ $descripcion = trim($_POST['descripcion']);
 $stock = intval($_POST['stock']);
 $precio = floatval($_POST['precio']);
 
-if (!es_duenio_producto($con, $id_producto, $id_usuario)) {
-    header("Location: ../editar.php");
+if (!puede_editar_producto($con, $id_producto, $id_usuario)) {
+    header("Location: " . lista_de_productos());
     exit();
 }
 
@@ -89,5 +89,5 @@ foreach ($archivos_nuevos as $i) {
     mysqli_stmt_execute($stmt_archivo);
 }
 
-header("Location: ../editar.php?modificacion=ok");
+header("Location: " . lista_de_productos() . "?modificacion=ok");
 exit();

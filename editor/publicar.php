@@ -4,7 +4,12 @@ include_once("../components/permisos.php");
 // el chequeo va antes del header para que la redireccion funcione
 requiere_login("../pages/login.php");
 
-include_once("../components/header.php");
+// el admin tambien puede cargar productos desde su panel: le muestro su menu
+if (es_admin()) {
+    include_once("../components/header_admin.php");
+} else {
+    include_once("../components/header.php");
+}
 ?>
 
 <br> <main>
