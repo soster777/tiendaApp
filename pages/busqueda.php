@@ -1,20 +1,36 @@
 <?php
 include_once("../components/header.php");
 include_once("../components/config/config.php");
+include_once("../components/paginacion.php");
 
 // guardo lo que escribio tal cual: se usa en una consulta preparada y se escapa al mostrarlo
 // (con mysqli_real_escape_string, buscar O'Brien mostraba O\'Brien)
 $buscar = isset($_GET['buscar']) ? trim($_GET['buscar']) : "";
 
-if ($buscar != "") {
-    $patron = "%" . $buscar . "%";
-    $stmt = mysqli_prepare($con, "SELECT * FROM productos WHERE nombre LIKE ?");
-    mysqli_stmt_bind_param($stmt, "s", $patron);
-    mysqli_stmt_execute($stmt);
-    $respuesta_prod = mysqli_stmt_get_result($stmt);
-} else {
-    $respuesta_prod = mysqli_query($con, "SELECT * FROM productos");
+// paginacion: 8 productos por pagina
+$por_pagina = 8;
+$pagina = pagina_actual();
+$patron = "%" . $buscar . "%"; // con la busqueda vacia queda "%%", que trae todos los productos
+
+// primero cuento cuantos resultados hay en total, para saber cuantas paginas hacen falta
+$stmt = mysqli_prepare($con, "SELECT COUNT(*) AS cantidad FROM productos WHERE nombre LIKE ?");
+mysqli_stmt_bind_param($stmt, "s", $patron);
+mysqli_stmt_execute($stmt);
+$total_productos = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt))['cantidad'];
+$total_paginas = total_paginas($total_productos, $por_pagina);
+if ($total_paginas > 0 && $pagina > $total_paginas) {
+    $pagina = $total_paginas;
 }
+$desde = ($pagina - 1) * $por_pagina;
+
+// despues traigo solo los de esta pagina
+$stmt = mysqli_prepare($con, "SELECT * FROM productos WHERE nombre LIKE ? LIMIT ? OFFSET ?");
+mysqli_stmt_bind_param($stmt, "sii", $patron, $por_pagina, $desde);
+mysqli_stmt_execute($stmt);
+$respuesta_prod = mysqli_stmt_get_result($stmt);
+
+// para los links de la paginacion: urlencode deja el texto buscado listo para ir en la URL
+$url_paginacion = "busqueda.php?buscar=" . urlencode($buscar) . "&";
 
 $consulta_tipos = "SELECT id_tipo_archivo FROM tipos_archivos WHERE tipo IN ('JPG','JPEG','PNG')";
 $resp_tipos = mysqli_query($con, $consulta_tipos);
@@ -147,6 +163,7 @@ $tipos_lista = implode(",", $tipos_img);
                 }
                 ?>
             </div>
+            <?php mostrar_paginacion($pagina, $total_paginas, $url_paginacion); ?>
         </section>
     </div>
 </main>

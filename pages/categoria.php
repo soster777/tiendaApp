@@ -1,6 +1,7 @@
 <?php
 include_once("../components/header.php");
 include_once("../components/config/config.php");
+include_once("../components/paginacion.php");
 ?>
 
 <main>
@@ -37,7 +38,17 @@ include_once("../components/config/config.php");
 
                     <div class="row justify-content-center">
                         <?php
-                        $consulta_prod = "SELECT * FROM productos WHERE fk_categoria = '$id'";
+                        // paginacion: 8 productos por pagina (2 filas de 4 en pantallas grandes)
+                        $por_pagina = 8;
+                        $total_productos = mysqli_fetch_assoc(mysqli_query($con, "SELECT COUNT(*) AS cantidad FROM productos WHERE fk_categoria = '$id'"))['cantidad'];
+                        $total_paginas = total_paginas($total_productos, $por_pagina);
+                        $pagina = pagina_actual();
+                        if ($total_paginas > 0 && $pagina > $total_paginas) {
+                            $pagina = $total_paginas;
+                        }
+                        $desde = ($pagina - 1) * $por_pagina;
+
+                        $consulta_prod = "SELECT * FROM productos WHERE fk_categoria = '$id' LIMIT $por_pagina OFFSET $desde";
                         $respuesta_prod = mysqli_query($con, $consulta_prod);
 
                         // Tipos de archivos para las imágenes
@@ -145,6 +156,7 @@ include_once("../components/config/config.php");
                         }
                         ?>
                     </div>
+                    <?php mostrar_paginacion($pagina, $total_paginas, "categoria.php?id=$id&"); ?>
                 </section>
                 <?php
             } else {
