@@ -7,26 +7,32 @@ Los usuarios se registran, publican sus productos y compran productos de otros u
 ## Funcionalidades
 
 **Usuarios**
-- Registro e inicio de sesión
+- Registro e inicio de sesión (con validación en el navegador y en el servidor)
+- Página de bienvenida solo para usuarios logueados, con resumen de productos y compras
 - Perfil editable (nombre, mail, ubicación y contraseña)
 - Publicar, editar y eliminar productos propios, con varias imágenes o videos por producto
-- Buscador y filtro por categorías
+- Buscador y filtro por categorías, con paginación
 - Compra de productos con método de pago (tarjeta o CBU) y cuotas, con control de stock
 - Seguimiento del envío y confirmación de recepción
 - Historial de compras
 - Formulario de sugerencias con imagen adjunta
 
 **Administrador**
+- ABM de todos los productos de la tienda (de cualquier usuario), paginado y con imágenes
+- Gestión de usuarios: darle permiso de administrador a quien no lo tiene
 - ABM de categorías
 - Revisión de las sugerencias de los usuarios (pendiente, aprobada o rechazada)
 - Gestión del perfil
+
+**General**
+- Página de error propia cuando no se puede conectar a la base de datos
 
 ## Tecnologías
 
 - PHP 8 (mysqli)
 - MySQL / MariaDB
 - HTML, CSS y Bootstrap 5
-- JavaScript (vista previa de imágenes al publicar)
+- JavaScript (vista previa de imágenes al publicar y validación del registro)
 - XAMPP como entorno local
 
 ## Base de datos
@@ -71,8 +77,8 @@ El script completo está en [`database/tiendapp.sql`](database/tiendapp.sql).
 
 ```
 tiendApp/
-├── admin/        panel del administrador (categorías, sugerencias y perfil)
-├── components/   header, footer, conexión y permisos
+├── admin/        panel del administrador (productos, usuarios, categorías, sugerencias y perfil)
+├── components/   header, footer, conexión, permisos y paginación
 ├── database/     script SQL de la base
 ├── editor/       publicar y editar productos
 ├── log/          login, registro y cierre de sesión
