@@ -1,6 +1,6 @@
 # Créditos de las imágenes de productos
 
-Las fotos de los productos agregados (ids 7 a 30) son de Wikimedia Commons, con licencias libres.
+Estas fotos de productos son de Wikimedia Commons, con licencias libres.
 Se redimensionaron a 800 px y algunas se recortaron.
 
 | Archivo | Autor | Licencia | Fuente |
@@ -29,3 +29,7 @@ Se redimensionaron a 800 px y algunas se recortaron.
 | `1792729398_libretas.jpg` | Newone | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Newone_-_Grand_spiral_notebook_A7.jpg |
 | `1792729399_martin-fierro.jpg` | Charles Clérice | Public domain | https://commons.wikimedia.org/wiki/File:Martin_Fierro1.jpg |
 | `1792729400_quijote.jpg` | Miguel de Cervantes | Public domain | https://commons.wikimedia.org/wiki/File:Miguel_de_Cervantes_(1605)_El_ingenioso_hidalgo_Don_Quixote_de_la_Mancha.png |
+| `1792731828_reloj-negro.jpg` | Unnerving duck | CC0 | https://commons.wikimedia.org/wiki/File:PineTime_smartwatch.jpg |
+| `1792731829_reloj-blanco.jpg` | D Eaketts | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Huawei_Smartwatch_Fit_2_(1).jpg |
+| `1792731830_kit-escritorio.jpg` | TheUltimateGrass | CC0 | https://commons.wikimedia.org/wiki/File:School_Supplies.jpg |
+| `1792731831_clips-colores.jpg` | Dietmar Rabich | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:B%C3%BCroklammern_--_2021_--_6481.jpg |

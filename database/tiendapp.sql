@@ -48,13 +48,11 @@ INSERT INTO `archivos` (`id_archivo`, `nombre`, `fk_tipo_archivo`, `fk_producto`
 (8, '1765419585_Imagen6.jpg', 1, 3),
 (9, '1765419585_Imagen7.jpg', 1, 3),
 (10, '1765419585_Imagen8.jpg', 1, 3),
-(11, '1765419725_istockphoto-497252298-612x612.jpg', 1, 4),
-(12, '1765419725_istockphoto-515311485-612x612.jpg', 1, 4),
-(13, '1765419725_istockphoto-519176205-612x612.jpg', 1, 4),
-(14, '1765419725_istockphoto-515311513-612x612.jpg', 1, 4),
+(11, '1792731828_reloj-negro.jpg', 1, 4),
+(12, '1792731829_reloj-blanco.jpg', 1, 4),
 (15, '1765419830_Imagen3.jpg', 1, 5),
 (16, '1765419830_Imagen4.jpg', 1, 5),
-(17, '1765419974_gettyimages-124049200-612x612.jpg', 1, 6),
+(17, '1792731830_kit-escritorio.jpg', 1, 6),
 (18, '1792729377_termo.jpg', 1, 7),
 (19, '1792729378_mate.jpg', 1, 8),
 (20, '1792729379_mochila.jpg', 1, 9),
@@ -78,7 +76,8 @@ INSERT INTO `archivos` (`id_archivo`, `nombre`, `fk_tipo_archivo`, `fk_producto`
 (38, '1792729397_lampara.jpg', 1, 27),
 (39, '1792729398_libretas.jpg', 1, 28),
 (40, '1792729399_martin-fierro.jpg', 1, 29),
-(41, '1792729400_quijote.jpg', 1, 30);
+(41, '1792729400_quijote.jpg', 1, 30),
+(42, '1792731831_clips-colores.jpg', 1, 6);
 
 -- --------------------------------------------------------
 
@@ -593,7 +592,7 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de la tabla `archivos`
 --
 ALTER TABLE `archivos`
-  MODIFY `id_archivo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+  MODIFY `id_archivo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- AUTO_INCREMENT de la tabla `categorias`
